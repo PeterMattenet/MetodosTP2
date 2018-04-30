@@ -6,18 +6,32 @@
 
 Image::Image(std::string newFilePath){
 
-  	width = 0, height = 0;
+	width = 0, height = 0;
   	PPM_LOADER_PIXEL_TYPE pt = PPM_LOADER_PIXEL_TYPE_INVALID;
 	//  std::string filename = "buda.0.ppm";
-  	std::string filename = newFilePath;
-  	bool ret = LoadPPMFile(&imageBuffer, &width, &height, &pt, filename.c_str());
+  	filePath = newFilePath;
+  	bool ret = LoadPPMFile(&imageBuffer, &width, &height, &pt, filePath.c_str());
 	
 };
 Image::~Image(){
-
-	delete imageBuffer;
+	
+	delete [] imageBuffer;
 
 };
+
+void Image::aplanateImageArray(uchar* array){
+	for (int i = 0; i < height; ++i)
+	{
+		for (int j = 0; j < width; ++j)
+		{
+			array[i * width + j] = obtainPixelValue(i * width + j);
+		}
+	}
+}
+
+uchar Image::obtainPixelValue(unsigned int pixelNumber){
+	return imageBuffer[pixelNumber];
+}
 
 void Image::SaveImage(std::string newFilePath){
 

@@ -1,42 +1,27 @@
 #include <cstddef>
 #include <iostream>
-#include "ppmloader/ppmloader.cpp"
-#include "Image.cpp"
-//#include "knn.cpp"
+
+#include "knn.cpp"
 #include <vector>
 
 using namespace std;
 
-void testLoadAndSave(){
+// void testLoadAndSave(){
   
-  Image testImage = Image("ppmloader/buda.0.ppm");
-  testImage.SaveImage("ppmloader/buda.1.ppm");
-}
-
-// string testkNN(vector<string> dataSet, string faceSerached){
-//   vector<Image> imageDataSet = vector<Image>( );
-//   for (int i = 0; i < dataSet.size(); ++i)
-//   {
-//     Image img = Image(dataSet[i]);
-//     imageDataSet.push_back(img);
-//   }
-
-//   knnTable table = kknTable(imageDataSet);
-
-//   table.Find(faceSerached);
-
-//   return faceSerached;
+//   Image testImage = Image("ppmloader/buda.0.ppm");
+//   testImage.SaveImage("ppmloader/buda.1.ppm");
 // }
 
 
 int main() {
 
-  testLoadAndSave();
+  //testLoadAndSave();
   
-  //vector<string> imageDataSet(1,"ppmloader/buda.0.ppm");
+  vector<string> imageDataSet(1,"ppmloader/buda.0.ppm");
+  vector<int> ids(1, 5);
   
-  //string mostKSimilar = testkNN(imageDataSet, "ppmloader/buda.0.ppm");
-  //cout << mostKSimilar << endl;
+  knnTable table = knnTable(imageDataSet, ids);
+
  
   return 0;
 }
