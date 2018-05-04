@@ -27,7 +27,7 @@ public:
 		Image img = Image(fileName);
 		unsigned int imageLength = img.width * img.height;
 		uchar* aplanatedImageArray = new uchar[imageLength];
-		img.aplanateImageArray(aplanatedImageArray);
+		img.aplanateImageArray(aplanatedImageArray); // esto es necesario pues no puedo acceder a la parte privada de la imagen
 
 		// obtengo la norma2 de la nueva imagen
 		int newImageNorm2 = obtainVectorNorm(aplanatedImageArray, imageLength );
