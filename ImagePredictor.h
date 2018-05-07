@@ -22,10 +22,12 @@ public:
 	int n; //Cantidad de imagenes
 	int m; //TOTAL DE PIXELS
   
+  	// crea la basicImagePixelMatrix, que es la matriz X (inicial) en formato de vector<vector<double>>
 	ImagePredictor(){
 		createImageMatrix();
 		
 	}; 
+
 	~ImagePredictor(){};
 
 	// llena el vector imageDataSet con todas las imágenes del archivo de entrada (cuyo nombre es el primer elemento de imageFileDataSet, el parámetro de entrada)
@@ -45,13 +47,12 @@ public:
 	}
 
 	//PCA Y CAMBIO DE BASE
-   void generateBasisChangeMatrix(int alfa, int niter) {
+   	void generateBasisChangeMatrix(int alfa, int niter) {
    		currentAlfa = alfa;
 		// genero matriz X con pixeles en doubles
     	
     	// generar vector U de medianas
 		vector<double> vectorEsperanza;
-		//Creo la MAtriz X donde X_i = (X_i - u ) / sqrt(n-1)
  		for (int i = 0; i < m; i++) {
 			vectorEsperanza[i] = 0.0;
 			for (int j = 0; j < n; j++) {
@@ -60,16 +61,22 @@ public:
 			vectorEsperanza[i] = vectorEsperanza[i] / n;
 			//En U[i] tengo el promedio del pixel i
 		}
-    	
-    	vector<vector<double> > matrizRestadoEsperanza(n, vector<double>(m, 0.0));
 
+		//Creo la MAtriz X donde X_i = (X_i - u ) / sqrt(n-1)
+    	vector<vector<double> > matrizRestadoEsperanza(n, vector<double>(m, 0.0));
     	for (int i = 0 ;  i < m; i++){
         	for (int j = 0; j < n; j++) {
 				matrizRestadoEsperanza[j][i] = (basicImagePixelMatrix[j][i] - vectorEsperanza[i]);
 			}
     	}
 
+    	// *******************EMI CUANDO VEAS EL CÓDIGO LEETE ESTO POR FAVOR******************: No está faltando la división por sqrt(n-1)??????
+
     	vector<vector<double>> matrizRestadoEsperanzaTraspuesta(n, vector<double>(n, 0.0));
+
+    	// *******************EMI CUANDO VEAS EL CÓDIGO LEETE ESTO POR FAVOR******************: La matrizRestadoEsperanzaTranspuesta no debiera ser de (mxn)????
+
+
 		//Creo M matriz de covarianzas. M = [ (X^t)*(X) ] * (1/n-1)
 		vector<vector<double> > matrizCovarianza(m, vector<double>(m, 0.0));
 
@@ -81,8 +88,8 @@ public:
 		
     
 		//Ahora hay que diagonalizar M mediante el MetodoDeLaPotencia.
-    //Luego de obtener el primer autovalor y autovector, continuamos haciendo Deflacion para obtener el resto de autoval y autovec.
-    //Hacer ALFA deflaciones, donde ALFA es la canti|dad de columnas relevantes que vamos a dejar en nuestro cambio de base.
+    	//Luego de obtener el primer autovalor y autovector, continuamos haciendo Deflacion para obtener el resto de autoval y autovec.
+    	//Hacer ALFA deflaciones, donde ALFA es la cantidad de columnas relevantes que vamos a dejar en nuestro cambio de base.
 		//Finalmente, la matriz de cambio de base no son mas que los ALFA autovectores mas relevantes de la matriz M.
      	vector<vector<double>> matrizCambioBase(m, vector<double>(alfa, 0.0));
     
@@ -108,25 +115,25 @@ public:
       		RestarMatrices(matrizCovarianza, matrizProductoAutovectores);
     	}
     
-    basisChangeMatrix = matrizCambioBase;
+    	basisChangeMatrix = matrizCambioBase;
     
-    /*
-     * Z = vector de (mx1)
-     * 
-     * V = matriz de autovectores (m*alfa)
-     * 
-     * z` = V^t * z  (alfa*1)
-     * 
-     *----------------------------------
-     *  X matriz inicial de imagenes (n*m)
-     * 	
-     * 	X' = X * V ===> (n*alfa)
-     * 
-     * -------------
-     * 
-     * Luego, kNN(z', X', k) -> devuelve etiqueta. "k" es el parametro de con cuantos vecinos cercanos se vota. 
-     * 
-     * */
+	    /*
+		* Z = vector de (mx1)
+		* 
+		* V = matriz de autovectores (m*alfa)
+		* 
+		* z` = V^t * z  (alfa*1)
+		* 
+		*----------------------------------
+		*  X matriz inicial de imagenes (n*m)
+		* 	
+		* 	X' = X * V ===> (n*alfa)
+		* 
+		* -------------
+		* 
+		* Luego, kNN(z', X', k) -> devuelve etiqueta. "k" es el parametro de con cuantos vecinos cercanos se vota. 
+		* 
+		* */
 
 	}
 	
@@ -170,11 +177,9 @@ private:
 	// }
 
 	// vector<double> MultiplicarMatrizVector(){
- //    vector<double> res;
- //    return res;
- //  }	
-
-	// // llena el vector imageMatrix con todas las imágenes del imageDataSet 
+	//    vector<double> res;
+	//    return res;
+	//  }	 
 
 	void normalizar(vector<double> vec){
 		double sumaDouble = 0.0;
@@ -193,6 +198,7 @@ private:
 	}
 
 	double metodoDeLaPotencia(vector<vector<double> >& matriz, vector<double> vec, int niter){
+		// *******************EMI CUANDO VEAS EL CÓDIGO LEETE ESTO POR FAVOR******************: la matriz de entrada es la de covarianza que nunca es nula, creo que está mal la guarda matriz.size() != 0, calculo que quisieron poner == 0.
   		if (matriz.size() != 0 || matriz[0].size() != vec.size())
   		{
   			cout << "Parametros para metodo de la potencia erroneos" << endl;
@@ -207,7 +213,7 @@ private:
       		MultiplicarMatrizVectorDouble(matriz, vec, tempVector);
       		vec = tempVector;
       		normalizar(vec);
- 	  //En cada iteracion, perfecciono el autovector que devuelvo
+ 	  		//En cada iteracion, perfecciono el autovector que devuelvo
     	}
 
 		vector<double> matrizXVec(vec.size(), 0.0);
@@ -223,8 +229,6 @@ private:
 
 
 	void createImageMatrix(){
-    	
-    
     	vector<vector<double> > matrix(imageDataSet.size(), vector<double>(n * m, 0.0));
 		for (int i = 0; i < imageDataSet.size(); ++i)
 		{		
