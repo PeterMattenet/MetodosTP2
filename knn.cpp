@@ -1,6 +1,7 @@
 #include <vector>
 #include <algorithm>
 #include "Image.cpp"
+#include "matrix.h"
 
 using namespace std;
 

@@ -1,7 +1,8 @@
 #include <cstddef>
 #include <iostream>
 
-#include "knn.cpp"
+//#include "knn.cpp"
+#include "ImagePredictor.h"
 #include <vector>
 
 using namespace std;
@@ -20,7 +21,7 @@ int main() {
   vector<string> imageDataSet(1,"ppmloader/buda.0.ppm");
   vector<int> ids(1, 5);
   
-  knnTable table = knnTable(imageDataSet, ids);
+  //knnTable table = knnTable(imageDataSet, ids);
 
  
   return 0;
