@@ -64,7 +64,10 @@ double productoInternoVectores(vector<double>& vec1, vector<double>& vec2){
 
 int MultiplicarMatrizVectorDouble(vector<vector<double> >& matriz, vector<double>& vec, vector<double>& vectorRes){
 	if (matriz[0].size() != vec.size() || matriz[0].size() != vectorRes.size())
-		return -1;
+	{
+		cout << "Multiplicar matriz por vector con parametros erroneos"<< endl;
+		return -1;	
+	}
 
 	for(int i = 0; i < vectorRes.size(); i++){
 		for (int j = 0; j < matriz[i].size(); j++)
@@ -86,9 +89,10 @@ void MultiplicarEscalarPorMatriz(double escalar, vector<vector<double> >& matriz
 	}
 }
 
-int TrasponerMatriz(vector<vector<double>>& matriz, vector<vector<double>>& matrizT){
-	if (matriz.size() != matrizT.size() || matriz[0].size() != matrizT[0].size())
-		return -1;
+void TrasponerMatriz(vector<vector<double>>& matriz, vector<vector<double>>& matrizT){
+	if (matriz.size() != matrizT[0].size() || matriz[0].size() != matrizT.size())
+		cout << "Trasponer matriz con parametros erroneos" <<endl;
+
 
 	for (int i = 0; i < matriz.size(); ++i)
 	{
@@ -98,6 +102,5 @@ int TrasponerMatriz(vector<vector<double>>& matriz, vector<vector<double>>& matr
 		}
 	}
 
-	return 1;
 }
 
