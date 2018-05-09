@@ -10,10 +10,10 @@ class ImagePredictor
 {
 public:
 
-	vector<int> photoIds;
+	vector<int> photoIds; // ***************************** qué es esto??? si son las categorías, photoIds[i] corresponde con basicImagePixelMatriz[i]??????
 	vector<Image> imageDataSet; //MATRIZ X (inicial)
 	
-	vector<vector<double>> basicImagePixelMatrix;
+	vector<vector<double>> basicImagePixelMatrix; // cada vector<double> es una imagen del archivo de entrada
 	vector<vector<double>> basisChangeMatrix;
 	vector<vector<double>> pcaMatrix;
 
@@ -45,6 +45,9 @@ public:
 			imageDataSet.push_back(img);
 		}
 	}
+
+	// hay que hacer kNN acá
+
 
 	//PCA Y CAMBIO DE BASE
    	void generateBasisChangeMatrix(int alfa, int niter) {
@@ -94,6 +97,7 @@ public:
      	vector<vector<double>> matrizCambioBase(m, vector<double>(alfa, 0.0));
     
 		//Deflacion. Se modifica la matriz alfa cantidad de veces para obtener los alfa primeros autovectores.
+		// ********************POR FAVOR QUE ALGUIEN ENCAPSULE EL MÉTODO DE DEFLACIÓN A OTRA FUNCIÓN***************
     	for(int i=0; i< alfa ; i++){
       
       		double Ai; //Autovector de la iteracion i
@@ -171,16 +175,19 @@ public:
 	
 
 private:
-	// int obtainVectorNorm(uchar* aplanatedImageArray, unsigned int imageLength){
-	// 	//implementar
-	// 	return 1;
-	// }
+	double obtainVectorNorm(vector<double>& vec, unsigned int imageLength){
+		double norma2 = 0.0;
 
-	// vector<double> MultiplicarMatrizVector(){
-	//    vector<double> res;
-	//    return res;
-	//  }	 
+		for(int i = 0; i < vec.size(); i++){
+			norma2 += vec[i]*vec[i];
+		}
 
+		norma2 = sqrt(norma2);
+
+		return norma2;
+	}
+
+	// ******************EL VECTOR NO DEBIERA PASAR POR REFERENCIA PUES LO VAS A MODIFICAR EN EL MÉTODO DE LA POTENCIA???????***********
 	void normalizar(vector<double> vec){
 		double sumaDouble = 0.0;
 
