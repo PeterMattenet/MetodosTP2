@@ -131,7 +131,7 @@ bool LoadPPMFile(uchar** data, int *width, int *height, PPM_LOADER_PIXEL_TYPE* p
 	// Read PPM/PGM header P5/P6
 	int channels = 0;
 	char line[256];
-    char *ptr;
+  char *ptr;
 	fgets(line, 256, fid);
 
 	if ( line[0]=='P' && line[1]=='5' ) {
@@ -144,7 +144,7 @@ bool LoadPPMFile(uchar** data, int *width, int *height, PPM_LOADER_PIXEL_TYPE* p
 	}
 
   if (line[2] == '\n') {
-    fgets(line, 256, fid);
+//    fgets(line, 256, fid);
 
     // Parse comments
     fgets(line, 256, fid);

@@ -17,7 +17,6 @@ enum _PPM_LOADER_PIXEL_TYPE {
 } PPM_LOADER_PIXEL_TYPE;
 
 bool LoadPPMFile(uchar** data, int *width, int *height, PPM_LOADER_PIXEL_TYPE* pt, const char *filename);
-bool SavePPMFile(const char *filename, const void *src, int width, int height, PPM_LOADER_PIXEL_TYPE pt, const char* comments = nullptr);
+bool SavePPMFile(const char *filename, const void *src, int width, int height, PPM_LOADER_PIXEL_TYPE pt, const char* comments = NULL);
 
 #endif //__PPMLOADER_H__
-	
