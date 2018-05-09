@@ -2,8 +2,8 @@
 
 using namespace std;
 
-//multiplica matrices de dimensiones bien definidasy guarda el resultado en C
-int MultiplicarMatricesDouble(vector<vector<double> >& matrizA, vector<vector<double> >& matrizB, vector<vector<double> >& matrizC ){
+//multiplica matrices de dimensiones bien definidas y guarda el resultado en C
+int multiplicarMatricesDouble(vector<vector<double> >& matrizA, vector<vector<double> >& matrizB, vector<vector<double> >& matrizC ){
 	if (matrizA[0].size() != matrizB.size() || matrizC.size() != matrizA.size() || matrizB[0].size() != matrizC[0].size())
 		return -1;
 
@@ -21,7 +21,8 @@ int MultiplicarMatricesDouble(vector<vector<double> >& matrizA, vector<vector<do
 
 }
 
-void RestarMatrices(vector<vector<double>>& matrizA, vector<vector<double>>& matrizB){
+//Resta A - B, guardando el resultado en A.
+void restarMatrices(vector<vector<double> >& matrizA, vector<vector<double> >& matrizB){
 	if (matrizA.size() != matrizB.size() || matrizA[0].size() != matrizB[0].size())
 		cout << "Restar Matrices con parametros erroneos" << endl;
 
@@ -34,7 +35,7 @@ void RestarMatrices(vector<vector<double>>& matrizA, vector<vector<double>>& mat
 	}
 }
 
-void GenerarMatrizDeVectores(vector<double>& vec1, vector<double>& vec2, vector<vector<double>>& matriz){
+void generarMatrizDeVectores(vector<double>& vec1, vector<double>& vec2, vector<vector<double> >& matriz){
 	if (matriz.size() != vec1.size() || matriz[0].size() != vec2.size())
 		cout << "Generar Matriz de Vectores con parametros erroneos" << endl;
 
@@ -62,7 +63,7 @@ double productoInternoVectores(vector<double>& vec1, vector<double>& vec2){
 }
 
 
-int MultiplicarMatrizVectorDouble(vector<vector<double> >& matriz, vector<double>& vec, vector<double>& vectorRes){
+int multiplicarMatrizVectorDouble(vector<vector<double> >& matriz, vector<double>& vec, vector<double>& vectorRes){
 	if (matriz[0].size() != vec.size() || matriz[0].size() != vectorRes.size())
 	{
 		cout << "Multiplicar matriz por vector con parametros erroneos"<< endl;
@@ -79,7 +80,7 @@ int MultiplicarMatrizVectorDouble(vector<vector<double> >& matriz, vector<double
 	return 1;
 }
 
-void MultiplicarEscalarPorMatriz(double escalar, vector<vector<double> >& matriz){
+void multiplicarEscalarPorMatriz(double escalar, vector<vector<double> >& matriz){
 	for (int i = 0; i < matriz.size(); ++i)
 	{
 		for (int j = 0; j < matriz[i].size(); ++j)
@@ -89,17 +90,32 @@ void MultiplicarEscalarPorMatriz(double escalar, vector<vector<double> >& matriz
 	}
 }
 
-void TrasponerMatriz(vector<vector<double>>& matriz, vector<vector<double>>& matrizT){
+void trasponerMatriz(vector<vector<double> >& matriz, vector<vector<double> >& matrizT){
 	if (matriz.size() != matrizT[0].size() || matriz[0].size() != matrizT.size())
 		cout << "Trasponer matriz con parametros erroneos" <<endl;
 
 
 	for (int i = 0; i < matriz.size(); ++i)
 	{
-		for (int j = 0; i < matriz[i].size(); ++j)
+		for (int j = 0; j < matriz[0].size(); ++j)
 		{
 			matrizT[j][i] = matriz[i][j];
 		}
+	}
+
+}
+
+void mostrarMatriz(vector<vector<double> >& matriz){
+	int n = matriz.size();
+	int m = matriz[0].size();
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < m; ++j)
+		{
+			cout << matriz[i][j] << " " ;
+		}
+		cout << endl;
 	}
 
 }

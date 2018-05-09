@@ -198,7 +198,10 @@ private:
 	}
 
 	double metodoDeLaPotencia(vector<vector<double> >& matriz, vector<double> vec, int niter){
-		// *******************EMI CUANDO VEAS EL CÓDIGO LEETE ESTO POR FAVOR******************: la matriz de entrada es la de covarianza que nunca es nula, creo que está mal la guarda matriz.size() != 0, calculo que quisieron poner == 0.
+		// *******************EMI CUANDO VEAS EL CÓDIGO LEETE ESTO POR FAVOR******************: 
+		//la matriz de entrada es la de covarianza que nunca es nula, creo que está mal la guarda matriz.size() != 0, 
+		//calculo que quisieron poner == 0.
+  		
   		if (matriz.size() != 0 || matriz[0].size() != vec.size())
   		{
   			cout << "Parametros para metodo de la potencia erroneos" << endl;
