@@ -90,8 +90,8 @@ void testMostrarMatriz(){
 
 
 int main(){
-	testTrasponerMatriz();
-	//multiplicarMatrizVectorDouble();
+	//testTrasponerMatriz();
+	multiplicarMatrizVectorDouble();
 	//testGenerarMatrizDeVectores();
 	//testMultiplicarMatricesDouble();
 	//testMostrarMatriz();

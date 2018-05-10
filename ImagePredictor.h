@@ -24,7 +24,6 @@ public:
   
   	// crea la basicImagePixelMatrix, que es la matriz X (inicial) en formato de vector<vector<double>>
 	ImagePredictor(){
-		createImageMatrix();
 		
 	}; 
 
@@ -177,6 +176,40 @@ public:
 	// 	delete aplanatedImageArray;
 
 	// }
+	double metodoDeLaPotencia(vector<vector<double> >& matriz, vector<double> vec, int niter){
+  		
+  		if (matriz.size() == 0 || matriz[0].size() != vec.size())
+  		{
+  			cout << "Parametros para metodo de la potencia erroneos" << endl;
+			return 0;
+		}
+
+		double lambda1; 
+    	
+    	for(int i = 0; i< niter; i++){
+      		vector<double> tempVector(vec.size(), 0.0);
+      		
+      		multiplicarMatrizVectorDouble(matriz, vec, tempVector);
+
+      		vec = tempVector;
+      		normalizar(vec);
+ 	  		//En cada iteracion, perfecciono el autovector que devuelvo
+    	}
+
+    	
+
+		vector<double> matrizXVec(vec.size(), 0.0);
+
+    	multiplicarMatrizVectorDouble(matriz, vec, matrizXVec);
+
+    	double vtBvv = productoInternoVectores(vec, matrizXVec);
+    	double vtv = productoInternoVectores(vec, vec);
+    	lambda1 = vtBvv / vtv;
+    
+    	return lambda1;
+	}  
+
+
 
 	
 
@@ -208,36 +241,6 @@ private:
 			vec[i] = vec[i]/sumaDouble; 
 		}
 	}
-
-	double metodoDeLaPotencia(vector<vector<double> >& matriz, vector<double> vec, int niter){
-  		
-  		if (matriz.size() == 0 || matriz[0].size() != vec.size())
-  		{
-  			cout << "Parametros para metodo de la potencia erroneos" << endl;
-			return 0;
-		}
-
-    	double lambda1; 
-    	
-    	for(int i = 0; i< niter; i++){
-      		vector<double> tempVector(vec.size(), 0.0);
-
-      		multiplicarMatrizVectorDouble(matriz, vec, tempVector);
-      		vec = tempVector;
-      		normalizar(vec);
- 	  		//En cada iteracion, perfecciono el autovector que devuelvo
-    	}
-
-		vector<double> matrizXVec(vec.size(), 0.0);
-
-    	multiplicarMatrizVectorDouble(matriz, vec, matrizXVec);
-
-    	double vtBvv = productoInternoVectores(vec, matrizXVec);
-    	double vtv = productoInternoVectores(vec, vec);
-    	lambda1 = vtBvv / vtv;
-    
-    	return lambda1;
-	}  
 
 
 	void createImageMatrix(){
