@@ -116,33 +116,13 @@ public:
 		//Finalmente, la matriz de cambio de base no son mas que los ALFA autovectores mas relevantes de la matriz M.
      	
      	vector<vector<double> > matrizCambioBase(m, vector<double>(alfa, 0.0));
-    
-		//Deflacion. Se modifica la matriz alfa cantidad de veces para obtener los alfa primeros autovectores.
-		// ********************POR FAVOR QUE ALGUIEN ENCAPSULE EL MÉTODO DE DEFLACIÓN A OTRA FUNCIÓN***************
-    	for(int i=0; i< alfa ; i++){
-      
-      		double Ai; //Autovector de la iteracion i
-			vector<double> Vi(m, 0.0);//Autovector 1. Debe ser uno aleatorio para empezar el metodo de la potencia
-    		for(i=0;i<m;i++){
-        		double f = (double)rand() / (double)RAND_MAX;
-          		Vi[i] = f*255;
-        	}
-
-      		Ai = metodoDeLaPotencia(matrizCovarianza, Vi, niter);
-      
-    		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
-  			for(int j=0; j<m; j++){
-      			matrizCambioBase[j][i] = Vi[i];
-    		}
-      		vector<vector<double> > matrizProductoAutovectores(m , vector<double>(m,0.0));
-      		generarMatrizDeVectores(Vi, Vi, matrizProductoAutovectores); //Vi*Vi^t
-      		multiplicarEscalarPorMatriz(Ai, matrizProductoAutovectores); // Ai * (Vi*Vi^t)
-      		restarMatrices(matrizCovarianza, matrizProductoAutovectores);
-    	}
+    	
+    	obtenerAutovectoresDeflacion(matrizCovarianza, matrizCambioBase, alfa, niter);
+    	
     
     	basisChangeMatrix = matrizCambioBase;
     
-	  
+	   
 
 	}
 	
@@ -176,6 +156,30 @@ public:
 	// 	delete aplanatedImageArray;
 
 	// }
+	void obtenerAutovectoresDeflacion(vector<vector<double>>& matrizOriginal, vector<vector<double>>& matrizResultado, int alfa, int niter){
+    		// ********************POR FAVOR QUE ALGUIEN ENCAPSULE EL MÉTODO DE DEFLACIÓN A OTRA FUNCIÓN***************
+    	for(int i=0; i< alfa ; i++){
+      
+      		double Ai; //Autovector de la iteracion i
+			vector<double> Vi(matrizOriginal.size(), 0.0);//Autovector 1. Debe ser uno aleatorio para empezar el metodo de la potencia
+    		for(int j=0;j<matrizOriginal.size();j++){
+        		double f = (double)rand() / (double)RAND_MAX;
+          		Vi[j] = f*255;
+        	}
+
+      		Ai = metodoDeLaPotencia(matrizOriginal, Vi, niter);
+      
+    		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
+  			for(int j=0; j<m; j++){
+      			matrizResultado[j][i] = Vi[i];
+    		}
+      		vector<vector<double> > matrizProductoAutovectores(m , vector<double>(m,0.0));
+      		generarMatrizDeVectores(Vi, Vi, matrizProductoAutovectores); //Vi*Vi^t
+      		multiplicarEscalarPorMatriz(Ai, matrizProductoAutovectores); // Ai * (Vi*Vi^t)
+      		restarMatrices(matrizOriginal, matrizProductoAutovectores);
+    	}
+    }
+
 	double metodoDeLaPotencia(vector<vector<double> >& matriz, vector<double> vec, int niter){
   		
   		if (matriz.size() == 0 || matriz[0].size() != vec.size())
