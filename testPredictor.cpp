@@ -51,7 +51,7 @@ void testPredecirImagen(string testFilesPath, string predictFile){
 	ImagePredictor predictor = ImagePredictor();
 	predictor.loadImagesFromFileDataSet(filePaths);
 	
-	string imageObtained = predictor.clasificarImagen(predictFile, 10, 10, 30);
+	string imageObtained = predictor.clasificarImagen(predictFile, 20, 10, 50);
 	cout << "Imagen mas parecida" << endl;
 	cout << imageObtained << endl;
 }

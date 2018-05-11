@@ -76,6 +76,7 @@ public:
 		//PCA
 		//Genero la matriz de cambio de base
 		//V = matriz de autovectores (m*alfa)
+
 		generateBasisChangeMatrix(alfa, inter);
 		cout << "j" << endl;
 		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
@@ -97,6 +98,13 @@ public:
 		//X = matriz inicial de imagenes (n*m)
 		
 		cout << "c" << endl;
+		vector<double> z1AfterBaseChange (alfa, 0.0);
+
+		vector<double> imageAfterBasisChange = vector<double> (alfa, 0.0);
+		applyBasisChangeToImagePixelsVector(z1, z1AfterBaseChange);
+
+		
+
 		//¿deprecado?
 		//vector<vector<double> > matrizDeImagenes(this->basicImagePixelMatrix.size(), vector<double>(this->basicImagePixelMatrix[0].size(), 0.0));
 		//matrizDeImagenes = this->basicImagePixelMatrix;
@@ -111,7 +119,7 @@ public:
 
 		
 		//Finalmente, llamo a kNN con las z y X ya cambiados de base
-		return resolverKnn(z1, k);
+		return resolverKnn(pcaMatrix, imageDataSet, z1, k);
 
 
 
@@ -173,7 +181,7 @@ public:
 
 		cout << "k" << endl;
 		//Creo M matriz de covarianzas. M = [ (X^t)*(X) ] 
-		cout << m << endl;
+		
 		vector<vector<double> > matrizCovarianza(m, vector<double>(m, 0.0));
 		cout << "m" << endl;
 		multiplicarMatricesDouble(matrizRestadoEsperanzaTraspuesta, matrizRestadoEsperanza, matrizCovarianza );
@@ -220,8 +228,7 @@ public:
 
 
     	for(int i=0; i< alfa ; i++){
-      		
-    		double Ai; //Autovector de la iteracion i
+      		double Ai; //Autovector de la iteracion i
 			vector<double> Vi(m, 0.0);//Autovector 1. Debe ser uno aleatorio para empezar el metodo de la potencia
     		for(int j=0;j<m;j++){
         		double f = (double)rand() / (double)RAND_MAX;
@@ -230,7 +237,7 @@ public:
 
       		Ai = metodoDeLaPotencia(matrizOriginal, Vi, niter);
       		cout << Ai << endl;
-    		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
+      		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
   			for(int j=0; j<m; j++){
       			matrizResultado[j][i] = Vi[j];
     		}
@@ -278,13 +285,11 @@ public:
 	}  
 
 	//imagePixels es el vector imagen y K la cantidad de vecinos a considerar
-	string resolverKnn(vector<double> z, int k){
+	string resolverKnn(vector<vector<double> >& MatrizDatos, vector<Image*>& imagenes, vector<double> z, int k){
 		
 		//Knn no debe modificar el tamaño de la imagen. Asume que sus dimensiones coinciden con las de X con base cambiada(pcaMatrix)
 		
-		//vector<double> imageAfterBasisChange = vector<double> (alfa, 0.0);
-		//applyBasisChangeToImagePixelsVector(imagePixels, imageAfterBasisChange);
-
+		
 		
 		/*Hecho por grego. Se cambio por un multimap dado que si tienen la misma distancia(double) no se podria agregar dos elementos
 		*	
@@ -292,7 +297,7 @@ public:
 		*/
 		multimap<double,int> distancias;
  		for(int i = 0; i < n; i ++){
-	  		distancias.insert(pair<double,int>(distanceBetweenVector(z,pcaMatrix[i]), i));
+	  		distancias.insert(pair<double,int>(distanceBetweenVector(z,MatrizDatos[i]), i));
 		}
 
 		multimap<double, int>::reverse_iterator it = distancias.rbegin();
@@ -310,11 +315,11 @@ public:
 	 	//hago diccionario  key nombre de la imagen, value cantidad de votos
 	 	for(int i = 0 ; i < k; i ++){
 	 		if(votaciones[i] != 0 ){
-	 			if(votacionDeLabel.find(imageDataSet[i]->label) == votacionDeLabel.end()){
-	 				votacionDeLabel.insert(pair<string,int> (imageDataSet[i]->label, 1));	
+	 			if(votacionDeLabel.find(imagenes[i]->label) == votacionDeLabel.end()){
+	 				votacionDeLabel.insert(pair<string,int> (imagenes[i]->label, 1));	
 	 			}
 	 			else{
-	 				map<string,int>::iterator currentIt = votacionDeLabel.find(imageDataSet[i]->label);
+	 				map<string,int>::iterator currentIt = votacionDeLabel.find(imagenes[i]->label);
 	 				currentIt -> second += 1;
 	 			}	
 	 		}
@@ -398,8 +403,7 @@ private:
 
 	vector<double> restaEntreVectores(vector<double> v1, vector<double> v2 ){
 		vector<double> res ;
-		int n = v1.size();
-		for(int i = 0 ; i < n; i ++){
+		for(int i = 0 ; i < v1.size(); i ++){
 			res.push_back(v1[i] - v2[i]);
 		}
 		return res;
@@ -409,9 +413,8 @@ private:
 		std::vector<double> v3 = restaEntreVectores(v1,v2);
 		sort(v3.begin(), v3.end());
 		
-		int n = v3.size();
 		double ac = 0 ;
-		for(int i = 0 ; i < n; i ++){
+		for(int i = 0 ; i < v3.size(); i ++){
 			ac += v3[i]*v3[i];
 		}
 		return ac;
