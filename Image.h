@@ -5,6 +5,8 @@
 #include "ppmloader/ppmloader.cpp"
 #include <string>
 
+using namespace std;
+
 class Image
 {
 public:
@@ -18,8 +20,10 @@ public:
 	std::string filePath;
 	int height;
 	int width;
+	string label;
 private:
 	uchar* imageBuffer;
+	
 
 	
 };

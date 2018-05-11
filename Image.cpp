@@ -1,8 +1,20 @@
 
 #include <iostream>
 #include <cstddef>
-
 #include "Image.h"
+
+using namespace std;
+
+string obtainPathUntilLastFolder(string path){
+	int n = path.size() - 1 ;
+	int indiceUltimBarra = n;
+	for( ; indiceUltimBarra >= 0 ; indiceUltimBarra --){
+		if(path[indiceUltimBarra] == '/'){
+			break;
+		}
+	}
+	return path.substr(0,indiceUltimBarra);
+}
 
 Image::Image(std::string newFilePath){
 
@@ -10,6 +22,7 @@ Image::Image(std::string newFilePath){
   	PPM_LOADER_PIXEL_TYPE pt = PPM_LOADER_PIXEL_TYPE_INVALID;
 	//  std::string filename = "buda.0.ppm";
   	filePath = newFilePath;
+  	label = obtainPathUntilLastFolder(filePath);
   	bool ret = LoadPPMFile(&imageBuffer, &width, &height, &pt, filePath.c_str());
 	
 };
@@ -40,4 +53,6 @@ void Image::SaveImage(std::string newFilePath){
   		
   	bool ret = SavePPMFile(newFilePath.c_str(),imageBuffer,width,height,PPM_LOADER_PIXEL_TYPE_RGB_8B, comments);
 }
+
+
 
