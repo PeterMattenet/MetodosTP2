@@ -18,9 +18,9 @@ public:
 	//(n x m )
 	vector<vector<double> > basicImagePixelMatrix; // cada vector<double> es una imagen del archivo de entrada
 	//(m x alfa)
-	vector<vector<double> > basisChangeMatrix;
+	vector<vector<double> > basisChangeMatrix; 
 	//(n x alfa)
-	vector<vector<double> > pcaMatrix;
+	vector<vector<double> > pcaMatrix; //X CAMBIADO DE BASE.
 
 	int currentAlfa;
 
@@ -172,14 +172,16 @@ public:
 		trasponerMatriz(matrizRestadoEsperanza, matrizRestadoEsperanzaTraspuesta);
 
 		cout << "k" << endl;
-		//Creo M matriz de covarianzas. M = [ (X^t)*(X) ] * (1/n-1)
+		//Creo M matriz de covarianzas. M = [ (X^t)*(X) ] 
 		cout << m << endl;
 		vector<vector<double> > matrizCovarianza(m, vector<double>(m, 0.0));
 		cout << "m" << endl;
 		multiplicarMatricesDouble(matrizRestadoEsperanzaTraspuesta, matrizRestadoEsperanza, matrizCovarianza );
 		cout << "l" << endl;
-		// M * (1/(n-1))
-		multiplicarEscalarPorMatriz(1/(n-1), matrizCovarianza);
+
+
+		// M * (1/(n-1)) ----> ¡NO! ya multiplicamos por sqrt(n-1)
+		//multiplicarEscalarPorMatriz(1/(n-1), matrizCovarianza);
 		
 		cout << "f" << endl;
     
@@ -275,34 +277,38 @@ public:
     	return lambda1;
 	}  
 
-
-	string resolverKnn(vector<double> imagePixels, int k){
+	//imagePixels es el vector imagen y K la cantidad de vecinos a considerar
+	string resolverKnn(vector<double> z, int k){
 		
+		//Knn no debe modificar el tamaño de la imagen. Asume que sus dimensiones coinciden con las de X con base cambiada(pcaMatrix)
+		
+		//vector<double> imageAfterBasisChange = vector<double> (alfa, 0.0);
+		//applyBasisChangeToImagePixelsVector(imagePixels, imageAfterBasisChange);
 
-		vector<double> imageAfterBasisChange = vector<double> (alfa, 0.0);
-		applyBasisChangeToImagePixelsVector(imagePixels, imageAfterBasisChange);
-
-		map<double,int> distancias;
+		
+		/*Hecho por grego. Se cambio por un multimap dado que si tienen la misma distancia(double) no se podria agregar dos elementos
+		*	
+		*
+		*/
+		multimap<double,int> distancias;
  		for(int i = 0; i < n; i ++){
-	  		distancias.insert(pair<double,int>(distanceBetweenVector(imageAfterBasisChange,pcaMatrix[i]), i));
+	  		distancias.insert(pair<double,int>(distanceBetweenVector(z,pcaMatrix[i]), i));
 		}
 
-		//falta ordenar el map en funcion de las distancias para elegir los primeros k nada mas
+		multimap<double, int>::reverse_iterator it = distancias.rbegin();
 
-	 	map<double,int>::reverse_iterator it = distancias.rbegin();
-	 	int i = 0 ;
-
+		int vecinos = 0;
 	 	vector<int> votaciones (n,0);
-	 	while(it != distancias.rend() && i < k ){
+	 	while(it != distancias.rend() && vecinos < k ){
 	  		votaciones[it->second] += 1;
-  			i++;
+  			vecinos++;
 	  		it++;
 	 	}
 
 	 	map<string,int> votacionDeLabel;
 
 	 	//hago diccionario  key nombre de la imagen, value cantidad de votos
-	 	for(int i = 0 ; i < n; i ++){
+	 	for(int i = 0 ; i < k; i ++){
 	 		if(votaciones[i] != 0 ){
 	 			if(votacionDeLabel.find(imageDataSet[i]->label) == votacionDeLabel.end()){
 	 				votacionDeLabel.insert(pair<string,int> (imageDataSet[i]->label, 1));	

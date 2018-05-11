@@ -21,7 +21,7 @@ int multiplicarMatricesDouble(vector<vector<double> >& matrizA, vector<vector<do
 
 }
 
-void multiplicarVectorMatrizDouble(vector<double>& vec, vector<vector<double>>& matriz, vector<double>& vecRes){
+void multiplicarVectorMatrizDouble(vector<double>& vec, vector<vector<double> >& matriz, vector<double>& vecRes){
 	if (vec.size() != matriz.size() || matriz[0].size() != vecRes.size()){
 		cout << "Multiplicar vector por matriz con parametros erroneos" << endl;
 		return;
