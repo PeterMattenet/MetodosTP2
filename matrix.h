@@ -12,12 +12,28 @@ int multiplicarMatricesDouble(vector<vector<double> >& matrizA, vector<vector<do
 		{
 			for (int k = 0; k < matrizA[0].size(); ++k)
 			{
-				matrizC[i][j] += matrizA[i][k] * matrizB[k][j];
-			}
+				matrizC[i][j] += matrizA[i][k] * matrizB[k][j]; 
+			} 
 		}
+		cout << "variando i " << i << endl;
+	}
+	return 1;
+
+}
+
+void multiplicarVectorMatrizDouble(vector<double>& vec, vector<vector<double>>& matriz, vector<double>& vecRes){
+	if (vec.size() != matriz.size() || matriz[0].size() != vecRes.size()){
+		cout << "Multiplicar vector por matriz con parametros erroneos" << endl;
+		return;
 	}
 
-	return 1;
+	for (int i = 0; i < vecRes.size(); ++i)
+	{
+		for (int j = 0; j < vec.size(); ++j)
+		{
+			vecRes[i] += vec[j] * matriz[j][i];
+		}
+	}
 
 }
 
@@ -118,5 +134,13 @@ void mostrarMatriz(vector<vector<double> >& matriz){
 		cout << endl;
 	}
 
+}
+
+void mostrarVector(vector<double>& vec){
+	for (int i = 0; i < vec.size(); ++i)
+	{
+		cout << vec[i] << " ";
+	}
+	cout << endl;
 }
 

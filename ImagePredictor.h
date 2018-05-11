@@ -13,7 +13,7 @@ class ImagePredictor
 public:
 
 	vector<int> photoIds; // ***************************** qué es esto??? si son las categorías, photoIds[i] corresponde con basicImagePixelMatriz[i]??????
-	vector<Image> imageDataSet; //MATRIZ X (inicial)
+	vector<Image*> imageDataSet; //MATRIZ X (inicial)
 	
 	//(n x m )
 	vector<vector<double> > basicImagePixelMatrix; // cada vector<double> es una imagen del archivo de entrada
@@ -37,16 +37,15 @@ public:
 
 	// llena el vector imageDataSet con todas las imágenes del archivo de entrada (cuyo nombre es el primer elemento de imageFileDataSet, el parámetro de entrada)
 	void loadImagesFromFileDataSet(vector<string>& imageFileDataSet) {
-		imageDataSet = vector<Image>();
-		n = 0;
+		imageDataSet = vector<Image*>();
 		m = 0; 
 
-		n = imageDataSet.size();
+		n = imageFileDataSet.size();
 
 		for (int i = 0; i < n; ++i)
 		{
-			Image img = Image(imageFileDataSet[i]);
-			m = img.width * img.height; 
+			Image* img = new Image(imageFileDataSet[i]);
+			m = img->width * img->height; 
 			imageDataSet.push_back(img);
 		}
 
@@ -61,35 +60,46 @@ public:
 	//PRE: Asume que las imagenes ya fueron levantadas con loadImagesFromFileDataSet
 	//PARAMS: Imagen. K: vecinos. Alfa: columnas/parametros relevantes. Inter: Cantidad iteraciones para Metodo de la potencia.
 	string clasificarImagen(string image, int k, int alfa, int inter){
-		
+
+
+		//¿Estamos rehaciendo pca por cada imagen que queremos comparar? 
+
+
+
 		//Levanto la imagen, y la pongo en un vector de doubles
 		//Z = vector de (mx1)
 		Image img = Image(image);
 		vector<double> imagePixels;
 		obtainImageInVectorDoubles(img,imagePixels);
 		
+		cout << "i" << endl;
 		//PCA
 		//Genero la matriz de cambio de base
 		//V = matriz de autovectores (m*alfa)
 		generateBasisChangeMatrix(alfa, inter);
-		vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
-		matrizCambioDeBase = this->basisChangeMatrix;
+		cout << "j" << endl;
+		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
+		//matrizCambioDeBase = this->basisChangeMatrix;
 
-
+		cout << "a" << endl;
 		//Genero la matriz donde trasponer el cambio de matriz: V^t (alfa*m)
-		vector<vector<double> > matrizCambioDeBaseTraspuesta(alfa, vector<double>(m, 0.0));
-		trasponerMatriz(matrizCambioDeBase, matrizCambioDeBaseTraspuesta);
+		//vector<vector<double> > matrizCambioDeBaseTraspuesta(alfa, vector<double>(m, 0.0));
+		//trasponerMatriz(matrizCambioDeBase, matrizCambioDeBaseTraspuesta);
 		
 
+		cout << "b" << endl;
 		//Ahora tengo que cambiar de base tanto Z como mi baseMatrix X.
 		
 		//z1 = V^t * z  (alfa*1)
 		vector<double> z1(alfa, 0.0);
-		multiplicarMatrizVectorDouble(matrizCambioDeBaseTraspuesta,imagePixels, z1);
+		multiplicarVectorMatrizDouble(imagePixels, basisChangeMatrix, z1);
 
 		//X = matriz inicial de imagenes (n*m)
-		vector<vector<double> > matrizDeImagenes(this->basicImagePixelMatrix.size(), vector<double>(this->basicImagePixelMatrix[0].size(), 0.0));
-		matrizDeImagenes = this->basicImagePixelMatrix;
+		
+		cout << "c" << endl;
+		//¿deprecado?
+		//vector<vector<double> > matrizDeImagenes(this->basicImagePixelMatrix.size(), vector<double>(this->basicImagePixelMatrix[0].size(), 0.0));
+		//matrizDeImagenes = this->basicImagePixelMatrix;
 
 		//X1' = X * V ===> (n*alfa)
 		//YA ESTA GUARDADO EN PCAMATRIX!(Se guardo solo al generar)
@@ -135,7 +145,8 @@ public:
 		// genero matriz X con pixeles en doubles
     	
     	// generar vector U de medianas
-		vector<double> vectorEsperanza;
+
+		vector<double> vectorEsperanza(m, 0.0);
  		for (int i = 0; i < m; i++) {
 			vectorEsperanza[i] = 0.0;
 			for (int j = 0; j < n; j++) {
@@ -145,6 +156,8 @@ public:
 			//En U[i] tengo el promedio del pixel i
 		}
 
+		cout << "d" << endl;
+
 		//Creo la Matriz X donde X_i = (X_i - u ) / sqrt(n-1)
     	vector<vector<double> > matrizRestadoEsperanza(n, vector<double>(m, 0.0));
     	for (int i = 0 ;  i < m; i++){ //itero columnas
@@ -153,18 +166,22 @@ public:
 			}
     	}
     	
+		cout << "e" << endl;
     	//(X^t)
     	vector<vector<double> > matrizRestadoEsperanzaTraspuesta(m, vector<double>(n, 0.0));
 		trasponerMatriz(matrizRestadoEsperanza, matrizRestadoEsperanzaTraspuesta);
 
-
+		cout << "k" << endl;
 		//Creo M matriz de covarianzas. M = [ (X^t)*(X) ] * (1/n-1)
+		cout << m << endl;
 		vector<vector<double> > matrizCovarianza(m, vector<double>(m, 0.0));
+		cout << "m" << endl;
 		multiplicarMatricesDouble(matrizRestadoEsperanzaTraspuesta, matrizRestadoEsperanza, matrizCovarianza );
-
+		cout << "l" << endl;
 		// M * (1/(n-1))
 		multiplicarEscalarPorMatriz(1/(n-1), matrizCovarianza);
 		
+		cout << "f" << endl;
     
 		//Ahora hay que diagonalizar M mediante el MetodoDeLaPotencia.
     	//Luego de obtener el primer autovalor y autovector, continuamos haciendo Deflacion para obtener el resto de autoval y autovec.
@@ -176,68 +193,57 @@ public:
     	
     	basisChangeMatrix = matrizCambioBase;
 
-    	//pca matrix. (n x alfa)
-    	pcaMatrix = vector<vector<double> > (n, std::vector<double>(alfa, 0.0));
+
+		cout << "g" << endl;
+    	//pca matrix. (n x alfa); cambio de base (m x alfa)
+    	pcaMatrix = vector<vector<double> > (n, vector<double>(alfa, 0.0));
     	multiplicarMatricesDouble(basicImagePixelMatrix, matrizCambioBase, pcaMatrix);
+
+
+		cout << "h" << endl;
 
 	}
 	
 	
-	
-  
-  
-  //deprecado
-	// string obtainKSimilarPicture(string fileName){
-
-	// 	//transformo a nuestra estructura la imagen a identificar
-	// 	Image img = Image(fileName);
-	// 	unsigned int imageLength = img.width * img.height;
-	// 	uchar* aplanatedImageArray = new uchar[imageLength];
-	// 	img.aplanateImageArray(aplanatedImageArray); // esto es necesario pues no puedo acceder a la parte privada de la imagen
-
-	// 	// obtengo la norma2 de la nueva imagen
-	// 	int newImageNorm2 = obtainVectorNorm(aplanatedImageArray, imageLength );
-
-	// 	// creo un vector donde guardaré la distancia euclídea entre los puntos que representan a las imágenes de la base y el punto que representa a la imagen a identificar
-	// 	vector<unsigned int> squaredNorm2MinusNewPicture;
-	// 	for (int i = 0; i < imageDataSet.size(); i++){
-	// 		squaredNorm2MinusNewPicture.push_back(abs(newImageNorm2 - obtainVectorNorm(imageMatrix[i], imageLength)));
-	// 	}
-
-	// 	// ordeno el vector para luego tomar los k más cercanos
-	// 	std::sort(squaredNorm2MinusNewPicture.begin(), squaredNorm2MinusNewPicture.end());
-
-	// 	//buscar los k primeros y definir cual es la id moda, retornar el path de la imagen con dicho id
-
-	// 	delete aplanatedImageArray;
-
-	// }
-	void obtenerAutovectoresDeflacion(vector<vector<double> >& matrizOriginal, vector<vector<double> >& matrizResultado, int alfa, int niter){
+	//Para hacerlo testeable se modifico m por el tamaño de la matriz parametro, se pasa por copia la matriz original
+	//Recordar revertir cambios una vez que sepamos bien que funciona
+	void obtenerAutovectoresDeflacion(vector<vector<double> > matrizOriginal, vector<vector<double> >& matrizResultado, int alfa, int niter){
+		
+		//ESCENCIAL PARA RECORDAR EL ALFA DE LA PCA ACTUAL ya que las matrices son todas de n x m, no n x alfa
 		this->alfa = alfa;
+		//borrar despues de test
+		m = matrizOriginal.size();
+		//
+
+
 
     	for(int i=0; i< alfa ; i++){
-      
-      		double Ai; //Autovector de la iteracion i
-			vector<double> Vi(matrizOriginal.size(), 0.0);//Autovector 1. Debe ser uno aleatorio para empezar el metodo de la potencia
-    		for(int j=0;j<matrizOriginal.size();j++){
+      		
+    		double Ai; //Autovector de la iteracion i
+			vector<double> Vi(m, 0.0);//Autovector 1. Debe ser uno aleatorio para empezar el metodo de la potencia
+    		for(int j=0;j<m;j++){
         		double f = (double)rand() / (double)RAND_MAX;
           		Vi[j] = f*255;
         	}
 
       		Ai = metodoDeLaPotencia(matrizOriginal, Vi, niter);
-      
+      		cout << Ai << endl;
     		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
   			for(int j=0; j<m; j++){
-      			matrizResultado[j][i] = Vi[i];
+      			matrizResultado[j][i] = Vi[j];
     		}
       		vector<vector<double> > matrizProductoAutovectores(m , vector<double>(m,0.0));
       		generarMatrizDeVectores(Vi, Vi, matrizProductoAutovectores); //Vi*Vi^t
       		multiplicarEscalarPorMatriz(Ai, matrizProductoAutovectores); // Ai * (Vi*Vi^t)
-      		restarMatrices(matrizOriginal, matrizProductoAutovectores);
+      		
+    		restarMatrices(matrizOriginal, matrizProductoAutovectores);
+
     	}
+
     }
 
-	double metodoDeLaPotencia(vector<vector<double> >& matriz, vector<double> vec, int niter){
+
+	double metodoDeLaPotencia(vector<vector<double> >& matriz, vector<double>& vec, int niter){
   		
   		if (matriz.size() == 0 || matriz[0].size() != vec.size())
   		{
@@ -258,15 +264,14 @@ public:
     	}
 
     	
-
-		vector<double> matrizXVec(vec.size(), 0.0);
+    	vector<double> matrizXVec(vec.size(), 0.0);
 
     	multiplicarMatrizVectorDouble(matriz, vec, matrizXVec);
 
     	double vtBvv = productoInternoVectores(vec, matrizXVec);
     	double vtv = productoInternoVectores(vec, vec);
     	lambda1 = vtBvv / vtv;
-    
+    	
     	return lambda1;
 	}  
 
@@ -282,10 +287,12 @@ public:
 	  		distancias.insert(pair<double,int>(distanceBetweenVector(imageAfterBasisChange,pcaMatrix[i]), i));
 		}
 
+		//falta ordenar el map en funcion de las distancias para elegir los primeros k nada mas
+
 	 	map<double,int>::reverse_iterator it = distancias.rbegin();
 	 	int i = 0 ;
 
-	 	vector<int> votaciones (0,n);
+	 	vector<int> votaciones (n,0);
 	 	while(it != distancias.rend() && i < k ){
 	  		votaciones[it->second] += 1;
   			i++;
@@ -297,11 +304,11 @@ public:
 	 	//hago diccionario  key nombre de la imagen, value cantidad de votos
 	 	for(int i = 0 ; i < n; i ++){
 	 		if(votaciones[i] != 0 ){
-	 			if(votacionDeLabel.find(imageDataSet[i].label) == votacionDeLabel.end()){
-	 				votacionDeLabel.insert(pair<string,int> (imageDataSet[i].label, 1));	
+	 			if(votacionDeLabel.find(imageDataSet[i]->label) == votacionDeLabel.end()){
+	 				votacionDeLabel.insert(pair<string,int> (imageDataSet[i]->label, 1));	
 	 			}
 	 			else{
-	 				map<string,int>::iterator currentIt = votacionDeLabel.find(imageDataSet[i].label);
+	 				map<string,int>::iterator currentIt = votacionDeLabel.find(imageDataSet[i]->label);
 	 				currentIt -> second += 1;
 	 			}	
 	 		}
@@ -356,7 +363,7 @@ private:
 		for (int i = 0; i < n; ++i)
 		{		
         	for( int j = 0; j < m; j++){
-      			matrix[i][j] = imageDataSet[i].obtainPixelValue(j); 
+      			matrix[i][j] = imageDataSet[i]->obtainPixelValue(j); 
     		}
 		}
 
@@ -379,7 +386,7 @@ private:
 		}
 	} 
 
-	void applyBasisChangeToImagePixelsVector(std::vector<double>& imagePixels, vector<double> imageAfterBasisChange){
+	void applyBasisChangeToImagePixelsVector(std::vector<double>& imagePixels, vector<double>& imageAfterBasisChange){
 		multiplicarMatrizVectorDouble(pcaMatrix,imagePixels,imageAfterBasisChange);
 	}
 
