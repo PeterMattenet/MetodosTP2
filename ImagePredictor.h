@@ -77,7 +77,7 @@ public:
 		//Genero la matriz de cambio de base
 		//V = matriz de autovectores (m*alfa)
 
-		generateBasisChangeMatrix(alfa, inter);
+		generateBasisChangeMatrixWithSVD(alfa, inter);
 		cout << "j" << endl;
 		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
 		//matrizCambioDeBase = this->basisChangeMatrix;
@@ -145,6 +145,75 @@ public:
 		*/
 	}
 
+	void generateBasisChangeMatrixWithSVD(int alfa, int niter){
+		currentAlfa = alfa;
+
+		vector<double> vectorEsperanza(m, 0.0);
+ 		for (int i = 0; i < m; i++) {
+			vectorEsperanza[i] = 0.0;
+			for (int j = 0; j < n; j++) {
+				vectorEsperanza[i] += basicImagePixelMatrix[j][i];
+			}
+			vectorEsperanza[i] = vectorEsperanza[i] / n;
+			//En U[i] tengo el promedio del pixel i
+		}
+
+		cout << "d" << endl;
+
+		//Creo la Matriz X donde X_i = (X_i - u ) / sqrt(n-1)
+    	vector<vector<double> > matrizRestadoEsperanza(n, vector<double>(m, 0.0));
+    	for (int i = 0 ;  i < m; i++){ //itero columnas
+        	for (int j = 0; j < n; j++) { //itero filas
+				matrizRestadoEsperanza[j][i] = (basicImagePixelMatrix[j][i] - vectorEsperanza[i]) / sqrt(n-1) ;
+			}
+    	}
+    	
+		cout << "e" << endl;
+    	//(X^t)
+    	vector<vector<double> > matrizRestadoEsperanzaTraspuesta(m, vector<double>(n, 0.0));
+		trasponerMatriz(matrizRestadoEsperanza, matrizRestadoEsperanzaTraspuesta);
+
+		cout << "k" << endl;
+		//Creo M matriz U de nxn. M = [ (X)*(X^t) ] 
+		
+		vector<vector<double> > matrizU(n, vector<double>(n, 0.0));
+		cout << "m" << endl;
+		multiplicarMatricesDouble(matrizRestadoEsperanza,matrizRestadoEsperanzaTraspuesta, matrizU );
+		cout << "l" << endl;
+
+		vector<vector<double> > matrizAutovectoresU(n, vector<double>(alfa, 0.0));
+		vector<double> alfaAutovalores(alfa, 0.0);
+    	obtenerAutovectoresDeflacion(matrizU, matrizAutovectoresU, alfaAutovalores,alfa, niter);
+
+    	vector<vector<double>> matrizAutovectoresV(m, vector<double>(alfa));
+    	for (int i = 0; i < alfa; ++i)
+    	{
+    		vector<double> Ui(n);
+    		for (int j = 0; j < n; ++j)
+    		{
+    			Ui[j]= matrizAutovectoresU[j][i];
+    		}
+
+    		vector<double> Vi(m, 0.0);
+    		multiplicarMatrizVectorDouble(matrizRestadoEsperanzaTraspuesta, Ui, Vi);
+    		for (int j = 0; j < m; ++j)
+    		{
+    			matrizAutovectoresV[j][i] = Vi[j] / sqrt(alfaAutovalores[i]);
+    		}
+
+    	}
+
+    	basisChangeMatrix = matrizAutovectoresV;
+
+
+		cout << "g" << endl;
+    	//pca matrix. (n x alfa); cambio de base (m x alfa)
+    	pcaMatrix = vector<vector<double> > (n, vector<double>(alfa, 0.0));
+    	multiplicarMatricesDouble(basicImagePixelMatrix, basisChangeMatrix, pcaMatrix);
+    	
+
+	}
+
 	//CAMBIO DE BASE
    	void generateBasisChangeMatrix(int alfa, int niter) {
    		currentAlfa = alfa;
@@ -197,7 +266,8 @@ public:
 		//Finalmente, la matriz de cambio de base no son mas que los ALFA autovectores mas relevantes de la matriz M.
      	
      	vector<vector<double> > matrizCambioBase(m, vector<double>(alfa, 0.0));
-    	obtenerAutovectoresDeflacion(matrizCovarianza, matrizCambioBase, alfa, niter);
+     	vector<double> autovalores(alfa, 0.0);
+    	obtenerAutovectoresDeflacion(matrizCovarianza, matrizCambioBase, autovalores, alfa, niter);
     	
     	basisChangeMatrix = matrizCambioBase;
 
@@ -214,7 +284,7 @@ public:
 	
 	//Para hacerlo testeable se modifico m por el tamaño de la matriz parametro, se pasa por copia la matriz original
 	//Recordar revertir cambios una vez que sepamos bien que funciona
-	void obtenerAutovectoresDeflacion(vector<vector<double> > matrizOriginal, vector<vector<double> >& matrizResultado, int alfa, int niter){
+	void obtenerAutovectoresDeflacion(vector<vector<double> > matrizOriginal, vector<vector<double> >& matrizResultado, vector<double>& autovalores, int alfa, int niter){
 		
 		//ESCENCIAL PARA RECORDAR EL ALFA DE LA PCA ACTUAL ya que las matrices son todas de n x m, no n x alfa
 		this->alfa = alfa;
@@ -233,6 +303,7 @@ public:
         	}
 
       		Ai = metodoDeLaPotencia(matrizOriginal, Vi, niter);
+      		autovalores[i] = Ai;
       		cout << Ai << endl;
       		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
   			for(int j=0; j<m; j++){
@@ -289,6 +360,10 @@ public:
 		*	
 		*
 		*/
+		for (int i = 0; i < imagenes.size(); ++i)
+		{
+			cout << imagenes[i]->label << endl;
+		}
 
 		// calculo distancias de z a cada una de la base y las inserto en un multimap
 		// el significado será el número de la imagen (es necesario pues se ordenan todas en el multimap)
