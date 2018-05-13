@@ -133,7 +133,6 @@ void mostrarMatriz(vector<vector<double> >& matriz){
 		}
 		cout << endl;
 	}
-
 }
 
 void mostrarVector(vector<double>& vec){
@@ -144,3 +143,10 @@ void mostrarVector(vector<double>& vec){
 	cout << endl;
 }
 
+void mostrarVectorInt(vector<int>& vec){
+	for (int i = 0; i < vec.size(); ++i)
+	{
+		cout << vec[i] << " ";
+	}
+	cout << endl;
+}

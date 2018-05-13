@@ -142,9 +142,7 @@ public:
 		* Luego, kNN(z', X', k) -> devuelve etiqueta. "k" es el parametro de con cuantos vecinos cercanos se vota. 
 		* 
 		* 
-	*/
-
-
+		*/
 	}
 
 	//CAMBIO DE BASE
@@ -211,7 +209,6 @@ public:
 
 
 		cout << "h" << endl;
-
 	}
 	
 	
@@ -248,7 +245,6 @@ public:
     		restarMatrices(matrizOriginal, matrizProductoAutovectores);
 
     	}
-
     }
 
 
@@ -289,22 +285,26 @@ public:
 		
 		//Knn no debe modificar el tamaño de la imagen. Asume que sus dimensiones coinciden con las de X con base cambiada(pcaMatrix)
 		
-		
-		
 		/*Hecho por grego. Se cambio por un multimap dado que si tienen la misma distancia(double) no se podria agregar dos elementos
 		*	
 		*
 		*/
+
+		// calculo distancias de z a cada una de la base y las inserto en un multimap
+		// el significado será el número de la imagen (es necesario pues se ordenan todas en el multimap)
 		multimap<double,int> distancias;
  		for(int i = 0; i < n; i ++){
 	  		distancias.insert(pair<double,int>(distanceBetweenVector(z,MatrizDatos[i]), i));
 		}
 
-		multimap<double, int>::reverse_iterator it = distancias.rbegin();
+		multimap<double, int>::iterator it = distancias.begin();
 
+		// armo vector de votaciones sólo considerando los k más cercanos
+		// votaciones[i] es la cantidad de votos que tuvo la imagen i
+		// en realidad votaciones[i] es 0 y 1, ya que o está entre las k más cercanas o no lo está.
 		int vecinos = 0;
 	 	vector<int> votaciones (n,0);
-	 	while(it != distancias.rend() && vecinos < k ){
+	 	while(it != distancias.end() && vecinos < k ){
 	  		votaciones[it->second] += 1;
   			vecinos++;
 	  		it++;
@@ -313,8 +313,9 @@ public:
 	 	map<string,int> votacionDeLabel;
 
 	 	//hago diccionario  key nombre de la imagen, value cantidad de votos
-	 	for(int i = 0 ; i < k; i ++){
+	 	for(int i = 0 ; i < votaciones.size(); i ++){
 	 		if(votaciones[i] != 0 ){
+	 			// si entramos a este caso, significa que la imagen i está entre las k más cercanas
 	 			if(votacionDeLabel.find(imagenes[i]->label) == votacionDeLabel.end()){
 	 				votacionDeLabel.insert(pair<string,int> (imagenes[i]->label, 1));	
 	 			}
@@ -325,9 +326,11 @@ public:
 	 		}
 	 	}
 
+	 	// recorro votacionDeLabel para quedarme con el de mayor repeticiones dentro de los k + cercanos
+	 	// en otras palabras, me quedo con la moda del conjunto
 	 	map<string,int>::iterator itRes = votacionDeLabel.begin();
 	 	for(map<string,int>::iterator it = votacionDeLabel.begin(); it != votacionDeLabel.end() ; it ++){
-	 		if(it -> second > it ->second){
+	 		if(it -> second > itRes -> second){
 	 			itRes = it;
 	 		}
 	 	}
