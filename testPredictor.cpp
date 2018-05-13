@@ -51,11 +51,16 @@ void testPredecirImagen(string testFilesPath, string predictFile){
 	ImagePredictor predictor = ImagePredictor();
 	predictor.loadImagesFromFileDataSet(filePaths);
 	
-	string imageObtained = predictor.clasificarImagen(predictFile, 20, 10, 50);
+	string imageObtained = predictor.clasificarImagen(predictFile, 20, 15, 200);
 	cout << "Imagen mas parecida" << endl;
 	cout << imageObtained << endl;
 }
+
+
+
 int main(){
-	testCargarPredictorConImagenes("tests/testBig.in");
-	testPredecirImagen("tests/testBig.in", "ImagenesCaras/s41/5.pgm");
+	
+	//testCargarPredictorConImagenes("tests/testBig.in");
+	testPredecirImagen("tests/testRed.in", "ImagenesCaras/s41/5.pgm");
+
 }
