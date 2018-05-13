@@ -102,29 +102,33 @@ string resolverKnnTest(vector<vector<double> >& MatrizDatos, vector<vector<doubl
 }
 
 
-
+//Idea Test: k=1, devuelve la imagen que mayor reduzca la diferencia.
 void testearKnn1(){
-	vector<vector<double>> testMatrix(5, vector<double>(5, 0.0));
+	vector<vector<double> > testMatrix(5, vector<double>(5, 0.0));
 	testMatrix[0][0] = 1.0;
 	testMatrix[0][1] = 2.0;
 	testMatrix[0][2] = 3.0;
 	testMatrix[0][3] = 4.0;
 	testMatrix[0][4] = 5.0;
+
 	testMatrix[1][0] = 2.0;
 	testMatrix[1][1] = 3.0;
 	testMatrix[1][2] = 4.0;
 	testMatrix[1][3] = 5.0;
 	testMatrix[1][4] = 6.0;
+
 	testMatrix[2][0] = 3.0;
 	testMatrix[2][1] = 4.0;
 	testMatrix[2][2] = 5.0;
 	testMatrix[2][3] = 6.0;
 	testMatrix[2][4] = 7.0;
+
 	testMatrix[3][0] = 4.0;
 	testMatrix[3][1] = 5.0;
 	testMatrix[3][2] = 6.0;
 	testMatrix[3][3] = 7.0;
 	testMatrix[3][4] = 8.0;
+
 	testMatrix[4][0] = 5.0;
 	testMatrix[4][1] = 6.0;
 	testMatrix[4][2] = 7.0;
@@ -152,28 +156,33 @@ void testearKnn1(){
 	// PASÓ OK LUEGO DE LAS MODIFICACIONES, DEVUELVE LO QUE TIENE QUE DEVOLVER ("carlos")
 }
 
+//Idea Test: Probar con 3 vecinos, dos de ellos con la misma etiqueta. Devolver esa.
 void testearKnn2(){
-	vector<vector<double>> testMatrix(5, vector<double>(5, 0.0));
+	vector<vector<double> > testMatrix(5, vector<double>(5, 0.0));
 	testMatrix[0][0] = 1.0;
 	testMatrix[0][1] = 2.0;
 	testMatrix[0][2] = 3.0;
 	testMatrix[0][3] = 4.0;
 	testMatrix[0][4] = 5.0;
+
 	testMatrix[1][0] = 2.0;
 	testMatrix[1][1] = 3.0;
 	testMatrix[1][2] = 4.0;
 	testMatrix[1][3] = 5.0;
 	testMatrix[1][4] = 6.0;
+
 	testMatrix[2][0] = 3.0;
 	testMatrix[2][1] = 4.0;
 	testMatrix[2][2] = 5.0;
 	testMatrix[2][3] = 6.0;
 	testMatrix[2][4] = 7.0;
+
 	testMatrix[3][0] = 4.0;
 	testMatrix[3][1] = 5.0;
 	testMatrix[3][2] = 6.0;
 	testMatrix[3][3] = 7.0;
 	testMatrix[3][4] = 8.0;
+
 	testMatrix[4][0] = 5.0;
 	testMatrix[4][1] = 6.0;
 	testMatrix[4][2] = 7.0;
@@ -201,28 +210,33 @@ void testearKnn2(){
 	// PASÓ OK LUEGO DE LAS MODIFICACIONES, DEVUELVE LO QUE TIENE QUE DEVOLVER ("juan").
 }
 
+//Idea Test: Mismo test1
 void testearKnn3(){
-	vector<vector<double>> testMatrix(5, vector<double>(5, 0.0));
+	vector<vector<double> > testMatrix(5, vector<double>(5, 0.0));
 	testMatrix[0][0] = 1.0;
 	testMatrix[0][1] = 2.0;
 	testMatrix[0][2] = 3.0;
 	testMatrix[0][3] = 4.0;
 	testMatrix[0][4] = 5.0;
+
 	testMatrix[1][0] = 2.0;
 	testMatrix[1][1] = 3.0;
 	testMatrix[1][2] = 4.0;
 	testMatrix[1][3] = 5.0;
 	testMatrix[1][4] = 6.0;
+
 	testMatrix[2][0] = 3.0;
 	testMatrix[2][1] = 4.0;
 	testMatrix[2][2] = 5.0;
 	testMatrix[2][3] = 6.0;
 	testMatrix[2][4] = 7.0;
+
 	testMatrix[3][0] = 4.0;
 	testMatrix[3][1] = 5.0;
 	testMatrix[3][2] = 6.0;
 	testMatrix[3][3] = 7.0;
 	testMatrix[3][4] = 8.0;
+
 	testMatrix[4][0] = 5.0;
 	testMatrix[4][1] = 6.0;
 	testMatrix[4][2] = 7.0;
@@ -250,28 +264,33 @@ void testearKnn3(){
 	// PASÓ OK LUEGO DE LAS MODIFICACIONES, DEVUELVE LO QUE TIENE QUE DEVOLVER ("pedro").
 }
 
+//Idea test: la imagen z pertenece al conjunto de testeo. Deberia devolver su etiqueta. (ver que esto NO sirve para experimentar en el informe)
 void testearKnn4(){
-	vector<vector<double>> testMatrix(5, vector<double>(5, 0.0));
+	vector<vector<double> > testMatrix(5, vector<double>(5, 0.0));
 	testMatrix[0][0] = 1.0;
 	testMatrix[0][1] = 2.0;
 	testMatrix[0][2] = 3.0;
 	testMatrix[0][3] = 4.0;
 	testMatrix[0][4] = 5.0;
+
 	testMatrix[1][0] = 2.0;
 	testMatrix[1][1] = 3.0;
 	testMatrix[1][2] = 4.0;
 	testMatrix[1][3] = 5.0;
 	testMatrix[1][4] = 6.0;
+
 	testMatrix[2][0] = 3.0;
 	testMatrix[2][1] = 4.0;
 	testMatrix[2][2] = 5.0;
 	testMatrix[2][3] = 6.0;
 	testMatrix[2][4] = 7.0;
+
 	testMatrix[3][0] = 4.0;
 	testMatrix[3][1] = 5.0;
 	testMatrix[3][2] = 6.0;
 	testMatrix[3][3] = 7.0;
 	testMatrix[3][4] = 8.0;
+
 	testMatrix[4][0] = 5.0;
 	testMatrix[4][1] = 6.0;
 	testMatrix[4][2] = 7.0;
@@ -299,10 +318,69 @@ void testearKnn4(){
 	// PASÓ OK LUEGO DE LAS MODIFICACIONES, DEVUELVE LO QUE TIENE QUE DEVOLVER ("juan").
 }
 
+//Idea Test: Tomo dos vecinos, con etiquetas distintas. Deberia devolver alguna de las dos.
+//Corolario: No importa el orden de las mismas, siempre devolvera la misma etiqueta en estos casos.
+void testearKnn5(){
+	vector<vector<double> > testMatrix(5, vector<double>(5, 0.0));
+	testMatrix[0][0] = 1.0;
+	testMatrix[0][1] = 2.0;
+	testMatrix[0][2] = 3.0;
+	testMatrix[0][3] = 4.0;
+	testMatrix[0][4] = 5.0;
+
+	testMatrix[1][0] = 2.0;
+	testMatrix[1][1] = 3.0;
+	testMatrix[1][2] = 4.0;
+	testMatrix[1][3] = 5.0;
+	testMatrix[1][4] = 6.0;
+
+	testMatrix[2][0] = 13.0;
+	testMatrix[2][1] = 14.0;
+	testMatrix[2][2] = 15.0;
+	testMatrix[2][3] = 16.0;
+	testMatrix[2][4] = 17.0;
+
+	testMatrix[3][0] = 14.0;
+	testMatrix[3][1] = 15.0;
+	testMatrix[3][2] = 16.0;
+	testMatrix[3][3] = 17.0;
+	testMatrix[3][4] = 18.0;
+
+	testMatrix[4][0] = 15.0;
+	testMatrix[4][1] = 16.0;
+	testMatrix[4][2] = 17.0;
+	testMatrix[4][3] = 18.0;
+	testMatrix[4][4] = 19.0;
+
+	vector<string> labels(5, "");
+	labels[0] = "pedro";
+	labels[1] = "carlos";
+	labels[2] = "juan";
+	labels[3] = "juan";
+	labels[4] = "carlos";
+
+	// resuelvo kNN con k = 2 y z = [6,7,8,9,10]. El resultado debiera ser "pedro" o "carlos", pues estas son las dos mas cercanas.
+
+	vector<double> imgAReconocer(5, 0.0);
+	imgAReconocer[0] = 6.0;
+	imgAReconocer[1] = 7.0;
+	imgAReconocer[2] = 8.0;
+	imgAReconocer[3] = 9.0;
+	imgAReconocer[4] = 10.0;
+
+	string res = resolverKnnTest(testMatrix, testMatrix, labels, imgAReconocer, 2);
+	cout << res << endl;
+
+	// PASÓ OK LUEGO DE LAS MODIFICACIONES, DEVUELVE LO QUE TIENE QUE DEVOLVER ("carlos").
+	
+}
+
+
 int main(){
-	testearKnn1();
-	testearKnn2();
-	testearKnn3();
-	testearKnn4();
+	//testearKnn1();
+	//testearKnn2();
+	//testearKnn3();
+	//testearKnn4();
+	testearKnn5();
 	return 0;
 }
