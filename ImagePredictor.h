@@ -77,7 +77,7 @@ public:
 		//Genero la matriz de cambio de base
 		//V = matriz de autovectores (m*alfa)
 
-		generateBasisChangeMatrixWithSVD(alfa, inter);
+		generateBasisChangeMatrix(alfa, inter);
 		cout << "j" << endl;
 		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
 		//matrizCambioDeBase = this->basisChangeMatrix;
@@ -91,18 +91,19 @@ public:
 		cout << "b" << endl;
 		//Ahora tengo que cambiar de base tanto Z como mi baseMatrix X.
 		
-		//z1 = V^t * z  (alfa*1)
+		//z1 = V * z  (alfa*1)
 		vector<double> z1(alfa, 0.0);
 		multiplicarVectorMatrizDouble(imagePixels, basisChangeMatrix, z1);
 
 		//X = matriz inicial de imagenes (n*m)
 		
+		/*
 		cout << "c" << endl;
 		vector<double> z1AfterBaseChange (alfa, 0.0);
 
 		vector<double> imageAfterBasisChange = vector<double> (alfa, 0.0);
 		applyBasisChangeToImagePixelsVector(z1, z1AfterBaseChange);
-
+		*/
 		
 
 		//¿deprecado?
@@ -185,10 +186,10 @@ public:
 		vector<double> alfaAutovalores(alfa, 0.0);
     	obtenerAutovectoresDeflacion(matrizU, matrizAutovectoresU, alfaAutovalores,alfa, niter);
 
-    	vector<vector<double>> matrizAutovectoresV(m, vector<double>(alfa));
+    	vector<vector<double> > matrizAutovectoresV(m, vector<double>(alfa, 0.0));
     	for (int i = 0; i < alfa; ++i)
     	{
-    		vector<double> Ui(n);
+    		vector<double> Ui(n, 0.0);
     		for (int j = 0; j < n; ++j)
     		{
     			Ui[j]= matrizAutovectoresU[j][i];
@@ -196,6 +197,7 @@ public:
 
     		vector<double> Vi(m, 0.0);
     		multiplicarMatrizVectorDouble(matrizRestadoEsperanzaTraspuesta, Ui, Vi);
+    		// mostrarVector(Vi);
     		for (int j = 0; j < m; ++j)
     		{
     			matrizAutovectoresV[j][i] = Vi[j] / sqrt(alfaAutovalores[i]);
@@ -205,12 +207,22 @@ public:
 
     	basisChangeMatrix = matrizAutovectoresV;
 
+    	// vamos a hacer testing. Muestro el primer autovector
+    	/*
+    	cout << "["; 
+    	for(int i = 0; i < matrizAutovectoresV.size(); i++){
+    		cout << matrizAutovectoresV[i][0];
+    		cout << ",";
+    		if(i == matrizAutovectoresV.size() - 1){
+    			cout << "]" << endl;
+    		}
+    	}
+    	*/
 
 		cout << "g" << endl;
     	//pca matrix. (n x alfa); cambio de base (m x alfa)
     	pcaMatrix = vector<vector<double> > (n, vector<double>(alfa, 0.0));
     	multiplicarMatricesDouble(basicImagePixelMatrix, basisChangeMatrix, pcaMatrix);
-    	
 
 	}
 
@@ -289,15 +301,15 @@ public:
 		//ESCENCIAL PARA RECORDAR EL ALFA DE LA PCA ACTUAL ya que las matrices son todas de n x m, no n x alfa
 		this->alfa = alfa;
 		//borrar despues de test
-		m = matrizOriginal.size();
+		int mPrima = matrizOriginal.size();
 		//
 
 
 
     	for(int i=0; i< alfa ; i++){
       		double Ai; //Autovector de la iteracion i
-			vector<double> Vi(m, 0.0);//Autovector 1. Debe ser uno aleatorio para empezar el metodo de la potencia
-    		for(int j=0;j<m;j++){
+			vector<double> Vi(mPrima, 0.0);//Autovector 1. Debe ser uno aleatorio para empezar el metodo de la potencia
+    		for(int j=0;j<mPrima;j++){
         		double f = (double)rand() / (double)RAND_MAX;
           		Vi[j] = f*255;
         	}
@@ -306,10 +318,10 @@ public:
       		autovalores[i] = Ai;
       		cout << Ai << endl;
       		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
-  			for(int j=0; j<m; j++){
+  			for(int j=0; j<mPrima; j++){
       			matrizResultado[j][i] = Vi[j];
     		}
-      		vector<vector<double> > matrizProductoAutovectores(m , vector<double>(m,0.0));
+      		vector<vector<double> > matrizProductoAutovectores(mPrima, vector<double>(mPrima,0.0));
       		generarMatrizDeVectores(Vi, Vi, matrizProductoAutovectores); //Vi*Vi^t
       		multiplicarEscalarPorMatriz(Ai, matrizProductoAutovectores); // Ai * (Vi*Vi^t)
       		

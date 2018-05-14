@@ -80,7 +80,7 @@ double productoInternoVectores(vector<double>& vec1, vector<double>& vec2){
 
 
 int multiplicarMatrizVectorDouble(vector<vector<double> >& matriz, vector<double>& vec, vector<double>& vectorRes){
-	if (matriz[0].size() != vec.size() || matriz[0].size() != vectorRes.size())
+	if (matriz[0].size() != vec.size() || matriz.size() != vectorRes.size())
 	{
 		cout << "Multiplicar matriz por vector con parametros erroneos"<< endl;
 		return -1;	
