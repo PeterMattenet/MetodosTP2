@@ -77,7 +77,7 @@ public:
 		//Genero la matriz de cambio de base
 		//V = matriz de autovectores (m*alfa)
 
-		generateBasisChangeMatrix(alfa, inter);
+		generateBasisChangeMatrixWithSVD(alfa, inter);
 		cout << "j" << endl;
 		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
 		//matrizCambioDeBase = this->basisChangeMatrix;
