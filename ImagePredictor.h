@@ -65,29 +65,23 @@ public:
 		//¿Estamos rehaciendo pca por cada imagen que queremos comparar? 
 
 
-		cout << "n" << endl;
 		//Levanto la imagen, y la pongo en un vector de doubles
 		//Z = vector de (mx1)
 		Image img = Image(image);
 		vector<double> imagePixels;
 		obtainImageInVectorDoubles(img,imagePixels);
 		
-		cout << "i" << endl;
 		//PCA
 		//Genero la matriz de cambio de base
 		//V = matriz de autovectores (m*alfa)
-
-		cout << "j" << endl;
 		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
 		//matrizCambioDeBase = this->basisChangeMatrix;
 
-		cout << "a" << endl;
 		//Genero la matriz donde trasponer el cambio de matriz: V^t (alfa*m)
 		//vector<vector<double> > matrizCambioDeBaseTraspuesta(alfa, vector<double>(m, 0.0));
 		//trasponerMatriz(matrizCambioDeBase, matrizCambioDeBaseTraspuesta);
 		
 
-		cout << "b" << endl;
 		//Ahora tengo que cambiar de base tanto Z como mi baseMatrix X.
 		
 		//z1 = V * z  (alfa*1)
@@ -158,8 +152,7 @@ public:
 			//En U[i] tengo el promedio del pixel i
 		}
 
-		cout << "d" << endl;
-
+		
 		//Creo la Matriz X donde X_i = (X_i - u ) / sqrt(n-1)
     	vector<vector<double> > matrizRestadoEsperanza(n, vector<double>(m, 0.0));
     	for (int i = 0 ;  i < m; i++){ //itero columnas
@@ -167,20 +160,15 @@ public:
 				matrizRestadoEsperanza[j][i] = (basicImagePixelMatrix[j][i] - vectorEsperanza[i]) / sqrt(n-1) ;
 			}
     	}
-    	
-		cout << "e" << endl;
     	//(X^t)
     	vector<vector<double> > matrizRestadoEsperanzaTraspuesta(m, vector<double>(n, 0.0));
 		trasponerMatriz(matrizRestadoEsperanza, matrizRestadoEsperanzaTraspuesta);
 
-		cout << "k" << endl;
 		//Creo M matriz U de nxn. M = [ (X)*(X^t) ] 
 		
 		vector<vector<double> > matrizU(n, vector<double>(n, 0.0));
-		cout << "m" << endl;
 		multiplicarMatricesDouble(matrizRestadoEsperanza,matrizRestadoEsperanzaTraspuesta, matrizU );
-		cout << "l" << endl;
-
+		
 		vector<vector<double> > matrizAutovectoresU(n, vector<double>(alfa, 0.0));
 		vector<double> alfaAutovalores(alfa, 0.0);
     	obtenerAutovectoresDeflacion(matrizU, matrizAutovectoresU, alfaAutovalores,alfa, niter);
@@ -218,8 +206,7 @@ public:
     	}
     	*/
 
-		cout << "g" << endl;
-    	//pca matrix. (n x alfa); cambio de base (m x alfa)
+		//pca matrix. (n x alfa); cambio de base (m x alfa)
     	pcaMatrix = vector<vector<double> > (n, vector<double>(alfa, 0.0));
     	multiplicarMatricesDouble(basicImagePixelMatrix, basisChangeMatrix, pcaMatrix);
 
@@ -242,8 +229,7 @@ public:
 			//En U[i] tengo el promedio del pixel i
 		}
 
-		cout << "d" << endl;
-
+		
 		//Creo la Matriz X donde X_i = (X_i - u ) / sqrt(n-1)
     	vector<vector<double> > matrizRestadoEsperanza(n, vector<double>(m, 0.0));
     	for (int i = 0 ;  i < m; i++){ //itero columnas
@@ -252,24 +238,20 @@ public:
 			}
     	}
     	
-		cout << "e" << endl;
-    	//(X^t)
+		//(X^t)
     	vector<vector<double> > matrizRestadoEsperanzaTraspuesta(m, vector<double>(n, 0.0));
 		trasponerMatriz(matrizRestadoEsperanza, matrizRestadoEsperanzaTraspuesta);
 
-		cout << "k" << endl;
 		//Creo M matriz de covarianzas. M = [ (X^t)*(X) ] 
 		
 		vector<vector<double> > matrizCovarianza(m, vector<double>(m, 0.0));
-		cout << "m" << endl;
 		multiplicarMatricesDouble(matrizRestadoEsperanzaTraspuesta, matrizRestadoEsperanza, matrizCovarianza );
-		cout << "l" << endl;
+		
 
 
 		// M * (1/(n-1)) ----> ¡NO! ya multiplicamos por sqrt(n-1)
 		//multiplicarEscalarPorMatriz(1/(n-1), matrizCovarianza);
-		
-		cout << "f" << endl;
+	
     
 		//Ahora hay que diagonalizar M mediante el MetodoDeLaPotencia.
     	//Luego de obtener el primer autovalor y autovector, continuamos haciendo Deflacion para obtener el resto de autoval y autovec.
@@ -282,14 +264,10 @@ public:
     	
     	basisChangeMatrix = matrizCambioBase;
 
-
-		cout << "g" << endl;
     	//pca matrix. (n x alfa); cambio de base (m x alfa)
     	pcaMatrix = vector<vector<double> > (n, vector<double>(alfa, 0.0));
     	multiplicarMatricesDouble(basicImagePixelMatrix, matrizCambioBase, pcaMatrix);
 
-
-		cout << "h" << endl;
 	}
 	
 	

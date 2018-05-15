@@ -65,13 +65,15 @@ void testAccurracyBig(string entrenamientoFilesPath, string testeoFilesPath){
 	predictor.loadImagesFromFileDataSet(filePathsEntrenamiento);
 	cout << "Cargando imagenes al predictor" << endl;
 	vector<string> results;
-	predictor.generateBasisChangeMatrixWithSVD(40, 500);
+	//Por alguna razon alfa=45 garpa, probe con 10 y tambien llega a los 90% pero 45 tiene unos 5% extra
+	predictor.generateBasisChangeMatrixWithSVD(45, 500);
 	vector<string> labelsTesteo;
 	cout << "Matriz cambio de base creada" << endl;
 	for (int i = 0; i < filePathsTesteo.size(); ++i)
 	{
 		cout << "Prediciendo la imagen " << i << endl;
 		labelsTesteo.push_back(obtainPathUntilLastFolder(filePathsTesteo[i]));
+		//k optimo por el momento fue 2
 		string imageObtained = predictor.clasificarImagen(filePathsTesteo[i], 2);
 		results.push_back(imageObtained);
 	}
