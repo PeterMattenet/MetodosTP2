@@ -3,8 +3,11 @@
 //#include <chrono>
 #include <vector>
 #include "ImagePredictor.h"
+#include <random>       // std::default_random_engine
+#include <chrono> 
 
 using namespace std;
+
 
 
 vector<string> levantarArchivosDesdeTest(string testFilesPath){
@@ -57,24 +60,28 @@ void testPredecirImagen(string testFilesPath, string predictFile){
 	cout << imageObtained << endl;
 }
 
-void testAccurracyBig(string entrenamientoFilesPath, string testeoFilesPath){
+
+
+double testAccurracyBig(vector<string>& entrenamientoFilesPath, vector<string>& testeoFilesPath){
 	cout << "Comenzando testeo" << endl;
-	vector<string> filePathsEntrenamiento = levantarArchivosDesdeTest(entrenamientoFilesPath);
-	vector<string> filePathsTesteo = levantarArchivosDesdeTest(testeoFilesPath);
+	//vector<string> filePathsEntrenamiento = levantarArchivosDesdeTest(entrenamientoFilesPath);
+	//vector<string> filePathsTesteo = levantarArchivosDesdeTest(testeoFilesPath);
 	ImagePredictor predictor = ImagePredictor();
-	predictor.loadImagesFromFileDataSet(filePathsEntrenamiento);
+	cout << entrenamientoFilesPath.size() << " " << endl;
+	cout << entrenamientoFilesPath[0] << " " << endl;
+	predictor.loadImagesFromFileDataSet(entrenamientoFilesPath);
 	cout << "Cargando imagenes al predictor" << endl;
 	vector<string> results;
 	//Por alguna razon alfa=45 garpa, probe con 10 y tambien llega a los 90% pero 45 tiene unos 5% extra
-	predictor.generateBasisChangeMatrixWithSVD(45, 500);
+	predictor.generateBasisChangeMatrixWithSVD(8, 300);
 	vector<string> labelsTesteo;
 	cout << "Matriz cambio de base creada" << endl;
-	for (int i = 0; i < filePathsTesteo.size(); ++i)
+	for (int i = 0; i < testeoFilesPath.size(); ++i)
 	{
 		cout << "Prediciendo la imagen " << i << endl;
-		labelsTesteo.push_back(obtainPathUntilLastFolder(filePathsTesteo[i]));
+		labelsTesteo.push_back(obtainPathUntilLastFolder(testeoFilesPath[i]));
 		//k optimo por el momento fue 2
-		string imageObtained = predictor.clasificarImagen(filePathsTesteo[i], 2);
+		string imageObtained = predictor.clasificarImagen(testeoFilesPath[i], 2);
 		results.push_back(imageObtained);
 	}
 	
@@ -94,6 +101,9 @@ void testAccurracyBig(string entrenamientoFilesPath, string testeoFilesPath){
 
 	cout << "Accurracy obtenida del algoritmo " << endl;
 	cout << accurracyPromediada * 100 << "% " << endl;
+
+	return accurracyPromediada;
+
 }
 
 void testAccurracyPromediadaBig(string entrenamientoFilesPath, string testeoFilesPath){
@@ -140,13 +150,42 @@ void testAccurracyPromediadaBig(string entrenamientoFilesPath, string testeoFile
 }
 
 
+void kFoldTestAccurracy(int k, string entrenamientoFilesPath){
+	cout << "Comenzando kfold" << endl;
+	vector<string> filePaths = levantarArchivosDesdeTest(entrenamientoFilesPath);
 
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+  	shuffle (filePaths.begin(), filePaths.end(), std::default_random_engine(seed));
+
+  	double accurracyFoldPromediada = 0.0;
+  	for (int i = 0; i < k; ++i)
+  	{	
+  		vector<string> entrenamiento;
+  		vector<string> testeo;
+  		
+  		for (int j = 0; j < filePaths.size(); ++j)
+  		{
+  			if (j % k == i){
+  				testeo.push_back(filePaths[j]);
+  			}else{
+  				entrenamiento.push_back(filePaths[j]);
+  			}
+  		}
+  		accurracyFoldPromediada += testAccurracyBig(entrenamiento, testeo);
+  	}
+
+  	cout << "Acurracy de k=" << k << " fold es:" <<endl;
+  	cout << accurracyFoldPromediada / k * 100 << "%" << endl;
+	
+}
 
 
 int main(){
 	
+	kFoldTestAccurracy(10, "tests/testFullBig.in");
 	//testCargarPredictorConImagenes("tests/testBig.in");
 	//testPredecirImagen("tests/testRed.in", "ImagenesCaras/s41/5.pgm");
 	//testAccurracyPromediadaBig("tests/entrenamientoFullBig.in","tests/testeoFullBig.in");
-	testAccurracyBig("tests/entrenamientoFullBig.in","tests/testeoFullBig.in");
+	//testAccurracyBig("tests/entrenamientoFullBig.in","tests/testeoFullBig.in");
 }
