@@ -59,13 +59,13 @@ public:
 	// clasificarImagen basicamente resuelve todo el ejercicio. Es el principal metodo al cual llamar.
 	//PRE: Asume que las imagenes ya fueron levantadas con loadImagesFromFileDataSet
 	//PARAMS: Imagen. K: vecinos. Alfa: columnas/parametros relevantes. Inter: Cantidad iteraciones para Metodo de la potencia.
-	string clasificarImagen(string image, int k, int alfa, int inter){
+	string clasificarImagen(string image, int k){
 
 
 		//¿Estamos rehaciendo pca por cada imagen que queremos comparar? 
 
 
-
+		cout << "n" << endl;
 		//Levanto la imagen, y la pongo en un vector de doubles
 		//Z = vector de (mx1)
 		Image img = Image(image);
@@ -77,7 +77,6 @@ public:
 		//Genero la matriz de cambio de base
 		//V = matriz de autovectores (m*alfa)
 
-		generateBasisChangeMatrixWithSVD(alfa, inter);
 		cout << "j" << endl;
 		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
 		//matrizCambioDeBase = this->basisChangeMatrix;
@@ -372,10 +371,6 @@ public:
 		*	
 		*
 		*/
-		for (int i = 0; i < imagenes.size(); ++i)
-		{
-			cout << imagenes[i]->label << endl;
-		}
 
 		// calculo distancias de z a cada una de la base y las inserto en un multimap
 		// el significado será el número de la imagen (es necesario pues se ordenan todas en el multimap)
