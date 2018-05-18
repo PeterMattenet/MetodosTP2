@@ -243,6 +243,7 @@ void kFoldEspecial(int kFoldValue, string entrenamientoFilesPath){
 				}
 			}
 			iterNumber2++;
+			// me acabo de dar cuenta que en lugar de usar iterNumber2 podría haber usado i..................
 			// ACÁ IRÍA EL ALGORITMO DE MEDIR ACCURACY POR EJEMPLO, O MEDIR LO QUE SEA
 		}
 	}
