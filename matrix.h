@@ -150,3 +150,11 @@ void mostrarVectorInt(vector<int>& vec){
 	}
 	cout << endl;
 }
+
+void mostrarVectorString(vector<string>& vec){
+	for (int i = 0; i < vec.size(); ++i)
+	{
+		cout << vec[i] << ", ";
+	}
+	cout << endl;	
+}
