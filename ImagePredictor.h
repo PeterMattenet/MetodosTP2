@@ -12,7 +12,7 @@ class ImagePredictor
 {
 public:
 
-	vector<int> photoIds; // ***************************** qué es esto??? si son las categorías, photoIds[i] corresponde con basicImagePixelMatriz[i]??????
+	vector<int> photoIds;
 	vector<Image*> imageDataSet; //MATRIZ X (inicial)
 	
 	//(n x m )
@@ -54,89 +54,35 @@ public:
 
 	//  
 	
-
-
-	// clasificarImagen basicamente resuelve todo el ejercicio. Es el principal metodo al cual llamar.
 	//PRE: Asume que las imagenes ya fueron levantadas con loadImagesFromFileDataSet
+	// y que ya fue creada la matriz de cambio de base (y PCA) con SVD
 	//PARAMS: Imagen. K: vecinos. Alfa: columnas/parametros relevantes. Inter: Cantidad iteraciones para Metodo de la potencia.
 	string clasificarImagen(string image, int k){
-
-
-		//¿Estamos rehaciendo pca por cada imagen que queremos comparar? 
-
-
 		//Levanto la imagen, y la pongo en un vector de doubles
 		//Z = vector de (mx1)
 		Image img = Image(image);
 		vector<double> imagePixels;
-		obtainImageInVectorDoubles(img,imagePixels);
-		
-		//PCA
-		//Genero la matriz de cambio de base
-		//V = matriz de autovectores (m*alfa)
-		//vector<vector<double> > matrizCambioDeBase(m, vector<double>(alfa, 0.0));
-		//matrizCambioDeBase = this->basisChangeMatrix;
+		obtainImageInVectorDoubles(img,imagePixels);	
 
-		//Genero la matriz donde trasponer el cambio de matriz: V^t (alfa*m)
-		//vector<vector<double> > matrizCambioDeBaseTraspuesta(alfa, vector<double>(m, 0.0));
-		//trasponerMatriz(matrizCambioDeBase, matrizCambioDeBaseTraspuesta);
-		
-
-		//Ahora tengo que cambiar de base tanto Z como mi baseMatrix X.
-		
+		//Ahora tengo que cambiar de base Z.
 		//z1 = V * z  (alfa*1)
 		vector<double> z1(alfa, 0.0);
 		multiplicarVectorMatrizDouble(imagePixels, basisChangeMatrix, z1);
 
-		//X = matriz inicial de imagenes (n*m)
-		
-		/*
-		cout << "c" << endl;
-		vector<double> z1AfterBaseChange (alfa, 0.0);
-
-		vector<double> imageAfterBasisChange = vector<double> (alfa, 0.0);
-		applyBasisChangeToImagePixelsVector(z1, z1AfterBaseChange);
-		*/
-		
-
-		//¿deprecado?
-		//vector<vector<double> > matrizDeImagenes(this->basicImagePixelMatrix.size(), vector<double>(this->basicImagePixelMatrix[0].size(), 0.0));
-		//matrizDeImagenes = this->basicImagePixelMatrix;
-
-		//X1' = X * V ===> (n*alfa)
-		//YA ESTA GUARDADO EN PCAMATRIX!(Se guardo solo al generar)
-
-		//De todas formas, aca esta otro metodo para hacerlo manualmente:
-		//vector<vector<double> > X1(n, vector<double>(alfa, 0.0));
-		//multiplicarMatricesDouble(matrizDeImagenes, matrizCambioDeBase, X1);
-
-
-		
 		//Finalmente, llamo a kNN con las z y X ya cambiados de base
 		return resolverKnn(pcaMatrix, imageDataSet, z1, k);
+	}
 
+	// Asume que las imágenes fueron levantadas con loadImagesFromFileDataSet
+	string clasificarImagenSinPca(string image, int k){
+		//Levanto la imagen, y la pongo en un vector de doubles
+		//Z = vector de (mx1)
+		Image img = Image(image);
+		vector<double> imagePixels;
+		obtainImageInVectorDoubles(img,imagePixels);	
 
-
-
-
-		/* Idea de la resolucion:
-		* Z = vector de (mx1)
-		* 
-		* V = matriz de autovectores (m*alfa)
-		* 
-		* z` = V^t * z  (alfa*1)
-		* 
-		*----------------------------------
-		*  X matriz inicial de imagenes (n*m)
-		* 	
-		* 	X' = X * V ===> (n*alfa)
-		* 
-		* -------------
-		* 
-		* Luego, kNN(z', X', k) -> devuelve etiqueta. "k" es el parametro de con cuantos vecinos cercanos se vota. 
-		* 
-		* 
-		*/
+		//Finalmente, llamo a kNN con las z y X ya cambiados de base
+		return resolverKnn(basicImagePixelMatrix, imageDataSet, imagePixels, k);
 	}
 
 	void generateBasisChangeMatrixWithSVD(int alfa, int niter){
