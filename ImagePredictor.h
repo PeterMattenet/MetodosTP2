@@ -239,7 +239,6 @@ public:
 
       		Ai = metodoDeLaPotencia(matrizOriginal, Vi, niter);
       		autovalores[i] = Ai;
-      		cout << Ai << endl;
       		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
   			for(int j=0; j<mPrima; j++){
       			matrizResultado[j][i] = Vi[j];

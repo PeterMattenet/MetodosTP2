@@ -373,8 +373,8 @@ void kFoldEspecialPorSiQuierenTestear(int kFoldValue, string entrenamientoFilesP
 int main(){
 	//kFoldTestAccurracy(5, "tests/testFullBig.in");
 	//testCargarPredictorConImagenes("tests/testBig.in");
-	//testPredecirImagen("tests/testRed.in", "ImagenesCaras/s41/5.pgm");
+	testPredecirImagen("tests/testFullBig.in", "ImagenesCaras/s41/5.pgm");
 	//testAccurracyPromediadaBig("tests/entrenamientoFullBig.in","tests/testeoFullBig.in");
 	//testAccurracyBig("tests/entrenamientoFullBig.in","tests/testeoFullBig.in");
-	kFoldEspecial(5, "tests/testFullRed.in");
+	//kFoldEspecial(5, "tests/testFullRed.in");
 }

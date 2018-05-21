@@ -15,7 +15,6 @@ int multiplicarMatricesDouble(vector<vector<double> >& matrizA, vector<vector<do
 				matrizC[i][j] += matrizA[i][k] * matrizB[k][j]; 
 			} 
 		}
-		cout << "variando i " << i << endl;
 	}
 	return 1;
 
