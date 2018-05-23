@@ -33,7 +33,13 @@ public:
 		
 	}; 
 
-	~ImagePredictor(){};
+	~ImagePredictor(){
+		for (int i = 0; i < imageDataSet.size(); ++i)
+		{
+			delete(imageDataSet[i]);
+		}
+		
+	};
 
 	// llena el vector imageDataSet con todas las imágenes del archivo de entrada (cuyo nombre es el primer elemento de imageFileDataSet, el parámetro de entrada)
 	void loadImagesFromFileDataSet(vector<string>& imageFileDataSet) {
@@ -238,6 +244,7 @@ public:
         	}
 
       		Ai = metodoDeLaPotencia(matrizOriginal, Vi, niter);
+      		cout << Ai << endl;
       		autovalores[i] = Ai;
       		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
   			for(int j=0; j<mPrima; j++){
