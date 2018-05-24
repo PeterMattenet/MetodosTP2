@@ -70,6 +70,53 @@ def exp1vs2():
 	plt.legend()
 	plt.show()	
 
+def expKnnTimeReduced():
+	df1 = pd.read_csv('accurVariandoKSinPCAK2Reduced.csv')
+	df2 = pd.read_csv('accurVariandoKSinPCAK5Reduced.csv')
+	df3 = pd.read_csv('accurVariandoKSinPCAK10Reduced.csv')
+
+	# Dens2 = df1[df1['densidad'] == 0.2]
+	# Dens5 = df1[df1['densidad'] == 0.5]
+
+	xdata  = df1['k']
+
+	ydataK2 = df1['Tiempo']
+	ydataK5 = df2['Tiempo']
+	ydataK10 = df3['Tiempo']
+
+	plt.plot(xdata, ydataK2, "r", alpha = 0.5, label='K = 2 (KFold)')
+	plt.plot(xdata, ydataK5, "g", alpha = 0.5, label='K = 5 (KFold)')
+	plt.plot(xdata, ydataK10, "b", alpha = 0.5, label='K = 10 (KFold)')
+
+	plt.xlabel('k (kNN)')
+	plt.ylabel('Tiempo en milisegundos')
+	plt.title('Imagenes reducidas')
+
+	plt.legend()
+	plt.show()
+
+def expKnnTimeK5():
+	df1 = pd.read_csv('accurVariandoKSinPCAK5.csv')
+
+	# Dens2 = df1[df1['densidad'] == 0.2]
+	# Dens5 = df1[df1['densidad'] == 0.5]
+
+	xdata  = df1['k']
+
+	ydata = df1['Tiempo']
+
+	plt.plot(xdata, ydata, "c", alpha = 0.5, label='K = 5')
+	plt.plot(50, 1000, "r", alpha=0.0)
+
+	plt.xlabel('k')
+	plt.ylabel('Tiempo en milisegundos')
+	plt.title('Imagenes sin reducir')
+
+	plt.legend()
+	plt.show()	
+
 # expKnnAccurReduced()
 # expKnnAccurK5()
-exp1vs2()
+# exp1vs2()
+# expKnnTimeReduced()
+expKnnTimeK5()

@@ -8,6 +8,7 @@
 using namespace std;
 
 std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
+std::chrono::duration<double, std::milli> elapsed_sum;
 
 vector<string> levantarArchivosDesdeTestNipo(string testFilesPath){
 	ifstream inFile;
@@ -53,6 +54,7 @@ double accuracyPromediadaSinPca(vector<string>& entrenamientoFilesPath, vector<s
 		startTime = std::chrono::system_clock::now();
 		string imageObtained = predictor.clasificarImagenSinPca(testeoFilesPath[i], k);
 		endTime = std::chrono::system_clock::now();
+		elapsed_sum += (endTime - startTime);
 		results.push_back(imageObtained);
 	}
 	
@@ -75,13 +77,13 @@ void testKnnSinPcaReduced(int kFoldValue){
 	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullRed.in");
 	string nombreFile;
 	if(kFoldValue == 2){
-		nombreFile = "testNipo/accurVariandoKSinPCAK2Reduced";
+		nombreFile = "testNipo/asf1.csv";
 	}
 	if(kFoldValue == 5){
-		nombreFile = "testNipo/accurVariandoKSinPCAK5Reduced";	
+		nombreFile = "testNipo/asf2.csv";	
 	}
 	if(kFoldValue == 10){
-		nombreFile = "testNipo/accurVariandoKSinPCAK10Reduced";
+		nombreFile = "testNipo/asf3.csv";
 	}
 	
 	fstream sal(nombreFile, ios::out);
@@ -105,6 +107,8 @@ void testKnnSinPcaReduced(int kFoldValue){
 		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 		shuffle(imagenesSeparadas[i].begin(), imagenesSeparadas[i].end(), std::default_random_engine(seed));
 	}
+
+	int sizeTesting = 0;
 
 	for(int kValue = 1; kValue < 100; kValue++){
 		double accur = 0.0;
@@ -159,6 +163,7 @@ void testKnnSinPcaReduced(int kFoldValue){
 					}
 				}
 			}
+			sizeTesting = testeo.size();
 			accur = accur + accuracyPromediadaSinPca(entrenamiento, testeo, kValue);
 		}
 		accur = accur / kFoldValue;
@@ -168,9 +173,9 @@ void testKnnSinPcaReduced(int kFoldValue){
 		sal << accur;
 		sal << ",";
 
-		std::chrono::duration<double, std::milli> elapsed_seconds = endTime-startTime;
+		std::chrono::duration<double, std::milli> elapsed_seconds = (elapsed_sum / (sizeTesting * kFoldValue));
 		sal << elapsed_seconds.count() << endl;
-
+		elapsed_sum = std::chrono::duration<double, std::milli>::zero();
 	}
 	sal.close();
 }
@@ -179,13 +184,13 @@ void testKnnSinPca(int kFoldValue){
 	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullBig.in");
 	string nombreFile;
 	if(kFoldValue == 2){
-		nombreFile = "testNipo/accurVariandoKSinPCAK2";
+		nombreFile = "testNipo/asd1.csv";
 	}
 	if(kFoldValue == 5){
-		nombreFile = "testNipo/accurVariandoKSinPCAK5";	
+		nombreFile = "testNipo/asd2.csv";	
 	}
 	if(kFoldValue == 10){
-		nombreFile = "testNipo/accurVariandoKSinPCAK10";
+		nombreFile = "testNipo/asd3.csv";
 	}
 	
 	fstream sal(nombreFile, ios::out);
@@ -209,6 +214,8 @@ void testKnnSinPca(int kFoldValue){
 		unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 		shuffle(imagenesSeparadas[i].begin(), imagenesSeparadas[i].end(), std::default_random_engine(seed));
 	}
+
+	int sizeTesting = 0;
 
 	for(int kValue = 1; kValue < 100; kValue++){
 		double accur = 0.0;
@@ -263,6 +270,7 @@ void testKnnSinPca(int kFoldValue){
 					}
 				}
 			}
+			sizeTesting = testeo.size();
 			accur = accur + accuracyPromediadaSinPca(entrenamiento, testeo, kValue);
 		}
 		accur = accur / kFoldValue;
@@ -272,8 +280,9 @@ void testKnnSinPca(int kFoldValue){
 		sal << accur;
 		sal << ",";
 
-		std::chrono::duration<double, std::milli> elapsed_seconds = endTime-startTime;
+		std::chrono::duration<double, std::milli> elapsed_seconds = (elapsed_sum / (sizeTesting * kFoldValue));
 		sal << elapsed_seconds.count() << endl;
+		elapsed_sum = std::chrono::duration<double, std::milli>::zero();
 
 	}
 	sal.close();
@@ -284,9 +293,9 @@ void testKnnSinPca(int kFoldValue){
 
 
 int main(){
-	testKnnSinPcaReduced(2);
-	testKnnSinPcaReduced(5);
-	testKnnSinPcaReduced(10);
+	// testKnnSinPcaReduced(2);
+	// testKnnSinPcaReduced(5);
+	// testKnnSinPcaReduced(10);
 	testKnnSinPca(5);
 	return 0;
 }

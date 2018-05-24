@@ -91,6 +91,64 @@ public:
 		return resolverKnn(basicImagePixelMatrix, imageDataSet, imagePixels, k);
 	}
 
+	// usa Knn devolviendo la primer moda que se genera
+	string clasificarImagenGrego(string image, int k){
+		//Levanto la imagen, y la pongo en un vector de doubles
+		//Z = vector de (mx1)
+		Image img = Image(image);
+		vector<double> imagePixels;
+		obtainImageInVectorDoubles(img,imagePixels);	
+
+		//Ahora tengo que cambiar de base Z.
+		//z1 = V * z  (alfa*1)
+		vector<double> z1(alfa, 0.0);
+		multiplicarVectorMatrizDouble(imagePixels, basisChangeMatrix, z1);
+
+		//Finalmente, llamo a kNN con las z y X ya cambiados de base
+		return resolverKnnGrego(pcaMatrix, imageDataSet, z1, k);
+	}
+
+	// usa Knn devolviendo la primer moda que se genera
+	string clasificarImagenSinPcaGrego(string image, int k){
+		//Levanto la imagen, y la pongo en un vector de doubles
+		//Z = vector de (mx1)
+		Image img = Image(image);
+		vector<double> imagePixels;
+		obtainImageInVectorDoubles(img,imagePixels);	
+
+		//Finalmente, llamo a kNN con las z y X ya cambiados de base
+		return resolverKnnGrego(basicImagePixelMatrix, imageDataSet, imagePixels, k);
+	}
+
+	// usa K-puntos para clasificar
+	string clasificarImagenPuntos(string image, int k){
+		//Levanto la imagen, y la pongo en un vector de doubles
+		//Z = vector de (mx1)
+		Image img = Image(image);
+		vector<double> imagePixels;
+		obtainImageInVectorDoubles(img,imagePixels);	
+
+		//Ahora tengo que cambiar de base Z.
+		//z1 = V * z  (alfa*1)
+		vector<double> z1(alfa, 0.0);
+		multiplicarVectorMatrizDouble(imagePixels, basisChangeMatrix, z1);
+
+		//Finalmente, llamo a kNN con las z y X ya cambiados de base
+		return knnPorPuntos(pcaMatrix, imageDataSet, z1, k);
+	}
+
+	// usa K-puntos para clasificar
+	string clasificarImagenSinPcaPuntos(string image, int k){
+		//Levanto la imagen, y la pongo en un vector de doubles
+		//Z = vector de (mx1)
+		Image img = Image(image);
+		vector<double> imagePixels;
+		obtainImageInVectorDoubles(img,imagePixels);	
+
+		//Finalmente, llamo a kNN con las z y X ya cambiados de base
+		return knnPorPuntos(basicImagePixelMatrix, imageDataSet, imagePixels, k);
+	}	
+
 	void generateBasisChangeMatrixWithSVD(int alfa, int niter){
 		currentAlfa = alfa;
 
@@ -244,7 +302,7 @@ public:
         	}
 
       		Ai = metodoDeLaPotencia(matrizOriginal, Vi, niter);
-      		cout << Ai << endl;
+      		// cout << Ai << endl;
       		autovalores[i] = Ai;
       		//Vi ahora tiene el iesimo autovector de M. Esta sera nuestra primera columna de la matriz 
   			for(int j=0; j<mPrima; j++){
@@ -350,8 +408,85 @@ public:
 	 	return itRes->first;
 	}
 
+	//imagePixels es el vector imagen y K la cantidad de vecinos a considerar
+	string resolverKnnGrego(vector<vector<double> >& MatrizDatos, vector<Image*>& imagenes, vector<double> z, int k){
+		
+		//Knn no debe modificar el tamaño de la imagen. Asume que sus dimensiones coinciden con las de X con base cambiada(pcaMatrix)
+		
+		/*Hecho por grego. Se cambio por un multimap dado que si tienen la misma distancia(double) no se podria agregar dos elementos
+		*	
+		*
+		*/
+
+		// calculo distancias de z a cada una de la base y las inserto en un multimap
+		// el significado será el número de la imagen (es necesario pues se ordenan todas en el multimap)
+		multimap<double,int> distancias;
+ 		for(int i = 0; i < n; i ++){
+	  		distancias.insert(pair<double,int>(distanceBetweenVector(z,MatrizDatos[i]), i));
+		}
+
+		multimap<double, int>::iterator it = distancias.begin();
+
+		// armo vector de votaciones sólo considerando los k más cercanos
+		// votaciones[i] es la cantidad de votos que tuvo la imagen i
+		// en realidad votaciones[i] es 0 y 1, ya que o está entre las k más cercanas o no lo está.
 
 
+	 	map<string,int> votacionDeLabel;
+	 	int vecinos = 0;
+	 	for(int i = 0 ; i < labels.size(); i ++){
+	 		if(votacionDeLabel.find(labels[i]) == votacionDeLabel.end()){
+	 			votacionDeLabel.insert(pair<string,int> (labels[i], 0));		
+	 		}
+	 	}
+
+	 	map<string,int>::iterator labelMasVotado = votacionDeLabel.begin();
+	 	while(it != distancias.end() && vecinos < k ){
+	 		map<string,int>::iterator currentLabel = votacionDeLabel.find(labels[it->second]);
+	 		currentLabel -> second += 1;
+
+	 		if(currentLabel -> second > labelMasVotado -> second){
+	 			labelMasVotado = currentLabel;
+	 		}
+
+  			vecinos++;
+	  		it++;
+	 	}
+
+	 	return labelMasVotado->first;
+	}
+
+	string knnPorPuntos(vector<vector<double> >& MatrizDatos, vector<Image*>& imagenes, vector<double> z, int k){
+		multimap<double,int> distancias;
+ 		for(int i = 0; i < n; i ++){
+	  		distancias.insert(pair<double,int>(distanceBetweenVector(z,MatrizDatos[i]), i));
+		}
+
+		multimap<double, int>::iterator it = distancias.begin();
+
+		map<string,int> votacionDeLabel;
+	 	int vecinos = 0;
+	 	for(int i = 0 ; i < labels.size(); i ++){
+	 		if(votacionDeLabel.find(labels[i]) == votacionDeLabel.end()){
+	 			votacionDeLabel.insert(pair<string,int> (labels[i], 0));		
+	 		}
+	 	}
+
+	 	map<string,int>::iterator labelMasVotado = votacionDeLabel.begin();
+	 	while(it != distancias.end() && vecinos < k ){
+	 		map<string,int>::iterator currentLabel = votacionDeLabel.find(labels[it->second]);
+	 		currentLabel -> second += (k - vecinos);
+
+	 		if(currentLabel -> second > labelMasVotado -> second){
+	 			labelMasVotado = currentLabel;
+	 		}
+
+  			vecinos++;
+	  		it++;
+	 	}
+
+	 	return labelMasVotado->first;
+	}
 	
 
 private:
