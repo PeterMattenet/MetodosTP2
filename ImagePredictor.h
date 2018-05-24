@@ -54,6 +54,7 @@ public:
 			Image* img = new Image(imageFileDataSet[i]);
 			m = img->width * img->height; 
 			imageDataSet.push_back(img);
+			labels.push_back(img->label);
 		}
 
 		createImageMatrix();
