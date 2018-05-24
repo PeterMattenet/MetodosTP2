@@ -14,6 +14,7 @@ public:
 
 	vector<int> photoIds;
 	vector<Image*> imageDataSet; //MATRIZ X (inicial)
+	vector<string> labels;
 	
 	//(n x m )
 	vector<vector<double> > basicImagePixelMatrix; // cada vector<double> es una imagen del archivo de entrada
