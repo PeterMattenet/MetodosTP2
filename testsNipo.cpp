@@ -52,7 +52,7 @@ double accuracyPromediadaSinPca(vector<string>& entrenamientoFilesPath, vector<s
 	for (int i = 0; i < testeoFilesPath.size(); ++i){
 		labelsTesteo.push_back(obtainPathUntilLastFolder(testeoFilesPath[i]));
 		startTime = std::chrono::system_clock::now();
-		string imageObtained = predictor.clasificarImagenSinPca(testeoFilesPath[i], k);
+		string imageObtained = predictor.clasificarImagenSinPcaGrego(testeoFilesPath[i], k);
 		endTime = std::chrono::system_clock::now();
 		elapsed_sum += (endTime - startTime);
 		results.push_back(imageObtained);
@@ -77,13 +77,13 @@ void testKnnSinPcaReduced(int kFoldValue){
 	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullRed.in");
 	string nombreFile;
 	if(kFoldValue == 2){
-		nombreFile = "testNipo/asf1.csv";
+		nombreFile = "testNipo/accurVariandoKSinPCAK2Reduced.csv";
 	}
 	if(kFoldValue == 5){
-		nombreFile = "testNipo/asf2.csv";	
+		nombreFile = "testNipo/accurVariandoKSinPCAK5Reduced.csv";	
 	}
 	if(kFoldValue == 10){
-		nombreFile = "testNipo/asf3.csv";
+		nombreFile = "testNipo/accurVariandoKSinPCAK10Reduced.csv";
 	}
 	
 	fstream sal(nombreFile, ios::out);
@@ -187,7 +187,7 @@ void testKnnSinPca(int kFoldValue){
 		nombreFile = "testNipo/asd1.csv";
 	}
 	if(kFoldValue == 5){
-		nombreFile = "testNipo/asd2.csv";	
+		nombreFile = "testNipo/accurVariandoKSinPCAK5.csv";	
 	}
 	if(kFoldValue == 10){
 		nombreFile = "testNipo/asd3.csv";
@@ -293,9 +293,9 @@ void testKnnSinPca(int kFoldValue){
 
 
 int main(){
-	// testKnnSinPcaReduced(2);
-	// testKnnSinPcaReduced(5);
-	// testKnnSinPcaReduced(10);
+	testKnnSinPcaReduced(2);
+	testKnnSinPcaReduced(5);
+	testKnnSinPcaReduced(10);
 	testKnnSinPca(5);
 	return 0;
 }
