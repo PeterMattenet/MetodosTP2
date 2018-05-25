@@ -3,7 +3,7 @@
 #include <utility>  
 #include <vector>
 #include <algorithm> 
-#include "ImagePredictor.h"
+#include "ImagePredictor_paraExperimentoNuevaBase.h"
 #include <random>       // std::default_random_engine
 #include <chrono> 
 #include <string>
@@ -862,5 +862,5 @@ void combinacionAlphaKBaseNueva5PliegosConKPuntos(){
 
 
 int main(){
-	
+	combinacionAlphaKBaseNueva2PliegosConKnn();
 }

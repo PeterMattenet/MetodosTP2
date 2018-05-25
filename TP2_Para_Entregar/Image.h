@@ -11,6 +11,7 @@ class Image
 {
 public:
 	Image(std::string newFilePath);
+	Image();
 	~Image();
 
 	void SaveImage(std::string newFilePath);
