@@ -8,6 +8,9 @@
 
 using namespace std;
 
+std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
+std::chrono::duration<double, std::milli> elapsed_seconds;
+
 
 
 vector<string> levantarArchivosDesdeTest(string testFilesPath){
@@ -436,16 +439,16 @@ void testNiter(string entrenamientoFilesPath){
 
     matrizImagenesOriginal = matrizU;
 
+    vector<vector<double> > matrizAutovalores700(m, vector<double>(100, 0.0));
    	vector<vector<double> > matrizAutovalores500(m, vector<double>(100, 0.0));
     vector<vector<double> > matrizAutovalores300(m, vector<double>(100, 0.0));
-   
     vector<vector<double> > matrizAutovalores100(m, vector<double>(100, 0.0));
     vector<vector<double> > matrizAutovalores50(m, vector<double>(100, 0.0));
     vector<vector<double> > matrizAutovalores25(m, vector<double>(100, 0.0));
     vector<vector<double> > matrizAutovalores10(m, vector<double>(100, 0.0));
 
     //autovalores.
-    
+    vector<double> autovaloresDe700(100, 0.0);
     vector<double> autovaloresDe500(100, 0.0);
     vector<double> autovaloresDe300(100, 0.0);
     vector<double> autovaloresDe100(100, 0.0);
@@ -454,35 +457,126 @@ void testNiter(string entrenamientoFilesPath){
     vector<double> autovaloresDe10(100, 0.0);
  
 
+
+
+    fstream tiemposNiter("tiemposNiter", ios::out);
+    tiemposNiter<<"niter,tiempo" << endl;
+    
+    //calculo niter 700
+
+    vector<vector<double> > matrizImagenesPara700 = matrizImagenesOriginal;
+    startTime = std::chrono::system_clock::now();
+    predictor.obtenerAutovectoresDeflacion(matrizImagenesPara700, matrizAutovalores700,autovaloresDe700,100, 700);
+    endTime = std::chrono::system_clock::now();
+    elapsed_seconds = endTime-startTime;
+	tiemposNiter <<700 <<","<< elapsed_seconds.count() << endl;
+
+
+
+
     //primero calculo con los niter 500.
 
     vector<vector<double> > matrizImagenesPara500 = matrizImagenesOriginal;
+    startTime = std::chrono::system_clock::now();
     predictor.obtenerAutovectoresDeflacion(matrizImagenesPara500, matrizAutovalores500,autovaloresDe500,100, 500);
+    endTime = std::chrono::system_clock::now();
+    elapsed_seconds = endTime-startTime;
+	tiemposNiter <<500 <<","<< elapsed_seconds.count() << endl;
+
+
 
     // calculo con los niter 300.
     vector<vector<double> > matrizImagenesPara300 = matrizImagenesOriginal;
+    startTime = std::chrono::system_clock::now();
     predictor.obtenerAutovectoresDeflacion(matrizImagenesPara300, matrizAutovalores300,autovaloresDe300,100, 300);
+    endTime = std::chrono::system_clock::now();
+    elapsed_seconds = endTime-startTime;
+	tiemposNiter <<300 <<","<< elapsed_seconds.count() << endl;
 
     
     //calculo para niter = 100;
     vector<vector<double> > matrizImagenesPara100 = matrizImagenesOriginal;
+    startTime = std::chrono::system_clock::now();
     predictor.obtenerAutovectoresDeflacion(matrizImagenesPara100, matrizAutovalores100,autovaloresDe100,100, 100);
+    endTime = std::chrono::system_clock::now();
+    elapsed_seconds = endTime-startTime;
+	tiemposNiter <<100 <<","<< elapsed_seconds.count() << endl;
 
     //calculo para niter = 50;
     vector<vector<double> > matrizImagenesPara50 = matrizImagenesOriginal;
+    startTime = std::chrono::system_clock::now();
     predictor.obtenerAutovectoresDeflacion(matrizImagenesPara50, matrizAutovalores50,autovaloresDe50,100, 50);
+    endTime = std::chrono::system_clock::now();
+    elapsed_seconds = endTime-startTime;
+	tiemposNiter <<50 <<","<< elapsed_seconds.count() << endl;
 
     //calculo para niter = 25;
     vector<vector<double> > matrizImagenesPara25 = matrizImagenesOriginal;
+    startTime = std::chrono::system_clock::now();
     predictor.obtenerAutovectoresDeflacion(matrizImagenesPara25, matrizAutovalores25,autovaloresDe25,100, 25);
+    endTime = std::chrono::system_clock::now();
+    elapsed_seconds = endTime-startTime;
+	tiemposNiter <<25 <<","<< elapsed_seconds.count() << endl;
 
 
     //calculo para niter = 10;
     vector<vector<double> > matrizImagenesPara10 = matrizImagenesOriginal;
+    startTime = std::chrono::system_clock::now();
     predictor.obtenerAutovectoresDeflacion(matrizImagenesPara10, matrizAutovalores10,autovaloresDe10,100, 10);
+    endTime = std::chrono::system_clock::now();
+    elapsed_seconds = endTime-startTime;
+	tiemposNiter <<10 <<","<< elapsed_seconds.count() << endl;
+
+
 	
 
-     //Escribo resultados niter 500
+    tiemposNiter.close();
+
+
+
+    //Escribo resultados niter 700
+    fstream sal700("niter700", ios::out);
+    sal700 << "Autovector,Error" << endl;
+    for (int i = 0; i < 100; ++i)
+    {
+        vector<double> autovectorIesimoDe700(n, 0.0);
+
+        for (int j = 0; j < n; ++j)
+        {
+        	autovectorIesimoDe700[j]  = matrizAutovalores700[j][i];
+
+        }
+
+        vector<vector<double> > matrizImagenesPara700T = matrizImagenesOriginal;
+        vector<double> Ax700(n, 0.0);
+        multiplicarMatrizVectorDouble(matrizImagenesPara700T,autovectorIesimoDe700, Ax700);
+
+       //Normalizo Ax
+        for (int j = 0; j < n; ++j)
+        {
+        	if(Ax700[j] < 0){Ax700[j]= Ax700[j]*(-1);}
+        }
+       
+       //Lx = 
+       vector<double> Lx700(n, 0.0);
+       for (int j = 0; j < n; ++j)
+       {
+       		double lxi = autovectorIesimoDe700[j] * autovaloresDe700[i]; 
+       		if(lxi < 0){Lx700[j] = lxi*(-1);}else{Lx700[j] = lxi;} 
+       }
+       
+
+       double diferencia = distanceBetweenVector(Ax700, Lx700);
+
+       sal700 << i << "," << diferencia << endl;
+    }
+    sal700.close();
+
+
+
+
+
+    //Escribo resultados niter 500
     fstream sal500("niter500", ios::out);
     sal500 << "Autovector,Error" << endl;
     for (int i = 0; i < 100; ++i)
