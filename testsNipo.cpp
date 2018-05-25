@@ -77,13 +77,13 @@ void testKnnSinPcaReduced(int kFoldValue){
 	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullRed.in");
 	string nombreFile;
 	if(kFoldValue == 2){
-		nombreFile = "testNipo/accurVariandoKSinPCAK2Reduced.csv";
+		nombreFile = "testNipo/asd1.csv";
 	}
 	if(kFoldValue == 5){
-		nombreFile = "testNipo/accurVariandoKSinPCAK5Reduced.csv";	
+		nombreFile = "testNipo/asd2.csv";	
 	}
 	if(kFoldValue == 10){
-		nombreFile = "testNipo/accurVariandoKSinPCAK10Reduced.csv";
+		nombreFile = "testNipo/asd3.csv";
 	}
 	
 	fstream sal(nombreFile, ios::out);
@@ -184,13 +184,13 @@ void testKnnSinPca(int kFoldValue){
 	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullBig.in");
 	string nombreFile;
 	if(kFoldValue == 2){
-		nombreFile = "testNipo/asd1.csv";
+		nombreFile = "testNipo/asf3.csv";
 	}
 	if(kFoldValue == 5){
-		nombreFile = "testNipo/accurVariandoKSinPCAK5.csv";	
+		nombreFile = "testNipo/asf2.csv";	
 	}
 	if(kFoldValue == 10){
-		nombreFile = "testNipo/asd3.csv";
+		nombreFile = "testNipo/asf3.csv";
 	}
 	
 	fstream sal(nombreFile, ios::out);
@@ -293,9 +293,9 @@ void testKnnSinPca(int kFoldValue){
 
 
 int main(){
-	testKnnSinPcaReduced(2);
+	// testKnnSinPcaReduced(2);
 	testKnnSinPcaReduced(5);
-	testKnnSinPcaReduced(10);
-	testKnnSinPca(5);
+	// testKnnSinPcaReduced(10);
+	// testKnnSinPca(5);
 	return 0;
 }

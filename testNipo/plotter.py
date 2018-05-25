@@ -106,7 +106,8 @@ def expKnnTimeK5():
 	ydata = df1['Tiempo']
 
 	plt.plot(xdata, ydata, "c", alpha = 0.5, label='K = 5')
-	plt.plot(50, 1000, "r", alpha=0.0)
+	plt.plot(50, 1400, "r", alpha=0.0)
+	plt.plot(50, 800, "r", alpha=0.0)
 
 	plt.xlabel('k')
 	plt.ylabel('Tiempo en milisegundos')
