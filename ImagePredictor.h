@@ -38,6 +38,7 @@ public:
 		{
 			delete(imageDataSet[i]);
 		}
+		cout << "Destruyendo predictor" << endl;
 		
 	};
 
