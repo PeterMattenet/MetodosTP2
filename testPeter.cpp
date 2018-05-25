@@ -9,6 +9,14 @@
 
 using namespace std;
 
+string directoryOfSnap = "snapImagePredictor";
+
+vector<ImagePredictor*> imagePredictors;
+vector<vector<string>> pathsEntrenamientoPorFold;
+vector<vector<string>> pathsTestPorFold;
+
+
+
 std::chrono::time_point<std::chrono::system_clock> startTime, endTime;
 
 vector<string> levantarArchivosDesdeTestNipo(string testFilesPath){
@@ -184,18 +192,20 @@ void CalcularMatrizConfusion(int kFoldValue, int alfa, int knn){
 
 }
 
-double testF1ScorePromediado(vector<string> entrenamientoPath, vector<string> testeoPath, vector<string> etiquetas){
-	ImagePredictor predictor = ImagePredictor();
-	predictor.loadImagesFromFileDataSet(entrenamientoPath);
+
+
+double testF1ScorePromediado(ImagePredictor& predictor, vector<string> testeoPath, int k, vector<string> etiquetas){
+	//ImagePredictor predictor = ImagePredictor();
+	//predictor.loadImagesFromFileDataSet(entrenamientoPath);
 
 	vector<string> results;
-	predictor.generateBasisChangeMatrixWithSVD(15, 100);
+	//predictor.generateBasisChangeMatrixWithSVD(15, 100);
 	vector<string> labelsTesteo;
 	
 	for (int i = 0; i < testeoPath.size(); ++i)
 	{
 		labelsTesteo.push_back(obtainPathUntilLastFolder(testeoPath[i]));
-		string imageObtained = predictor.clasificarImagen(testeoPath[i], 20);
+		string imageObtained = predictor.clasificarImagen(testeoPath[i], k);
 		results.push_back(imageObtained);
 	}
 	
@@ -223,22 +233,83 @@ double testF1ScorePromediado(vector<string> entrenamientoPath, vector<string> te
 			}
 		}
 
-		precisionPromediada += ((double) tpositivos / (tpositivos + fpositivos));
-		recallPromediada += ((double) tpositivos / (tpositivos + fnegativos));
+		if (tpositivos + fpositivos == 0){
+			cout << "tpositivos: " << tpositivos << endl;
+			cout << "fpositivos " << fpositivos << endl;	
+		}else{
+			precisionPromediada += ((double) tpositivos / (tpositivos + fpositivos));
+		}
+		
+
+		if (tpositivos + fnegativos == 0){
+			cout << "tpositivos: " << tpositivos << endl;
+			cout << "fnegativos " << fnegativos << endl;	
+		}
+		else{
+			recallPromediada += ((double) tpositivos / (tpositivos + fnegativos));
+		}
+		
 	}
 
 	precisionPromediada = precisionPromediada / results.size();
 	recallPromediada = recallPromediada / results.size();
-
+	
 	cout << "F1 score del algoritmo: " << endl;
 	double f1Score =  2 * precisionPromediada * recallPromediada / (precisionPromediada + recallPromediada);
 	cout << f1Score  << endl;
 	return f1Score;
 }
 
+void createImagePredictorWithAlpha(ImagePredictor& res, int k, int alpha){
+
+	res.alfa = alpha;
+	
+
+	// res.labels = imagePredictors[k].labels;
+
+	// for(int i = 0 ; i < pathsEntrenamientoPorFold[k].size(); i ++){
+	//   	Image* img = new Image();
+	//   	img->label  = obtainPathUntilLastFolder(pathsEntrenamientoPorFold[k][i]);
+	//   	res.imageDataSet.push_back(img);
+	// }
+
+	//res.basicImagePixelMatrix = imagePredictors[k].basicImagePixelMatrix;
+	//res.basicImagePixelMatrix = vector
+	for(int i = 0 ; i < res.m ; i ++ ){
+		vector<double > v ;
+		for(int j = 0; j < alpha; j++){
+			v.push_back(imagePredictors[k]->basisChangeMatrix[i][j]);
+		}
+		res.basisChangeMatrix.push_back(v);
+	}
+
+	for(int i = 0 ; i < res.n ; i ++ ){
+		vector<double > v ;
+		for(int j = 0; j < alpha; j++){
+			v.push_back(imagePredictors[k]->pcaMatrix[i][j]);
+		}
+		res.pcaMatrix.push_back(v);
+	}
+}
+
+
+void GuardarSnapDeMatrizPCA(vector<string>& pathsEntrenamiento, int alfa, int niter){
+	imagePredictors.push_back(new ImagePredictor());
+	cout << "Cargando imagenes" << endl;
+	cout << pathsEntrenamiento.size() << endl;
+	(imagePredictors.back())->loadImagesFromFileDataSet(pathsEntrenamiento);
+	cout << "Calculando cambio de base" << endl;
+	(imagePredictors.back())->generateBasisChangeMatrixWithSVD(alfa, niter);
+}
+
 void testF1ScoreSegunAlfaYk(int kFoldValue){
 	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullBig.in");
 	string nombreFile;
+
+	int minAlfa = 5;
+	int maxAlfa = 100;
+	int minK = 5;
+	int maxK = 100;
 	// stringstream ss;
 	// ss << "alfa" << alfa << "knn" << knn;
 	// string fileSuffix = ss.str();
@@ -251,46 +322,145 @@ void testF1ScoreSegunAlfaYk(int kFoldValue){
 	if(kFoldValue == 10){
 		nombreFile = "testPeterDir/f1ScoreAlfakK10";
 	}
-	cout << nombreFile << endl;
 	fstream sal(nombreFile, ios::out);
 
-	sal << "etiquetaObtenida,etiquetaEsperada,cantidad" << endl;
+	sal << "k,alfa,f1score" << endl;
 
 	cout << "Comienza con K = ";
 	cout << kFoldValue << endl;
 	cout << endl; 
 
-	vector<vector<string> > imagenesSeparadas(41, vector<string>(0, ""));
+	vector<vector<string> > imagenesSeparadas(41, vector<string>());
 	
 	DesordenarImagenes(filePaths, imagenesSeparadas);
 
-	vector<pair<int,int>> vectorDeConfusion;
+	vector<string> etiquetas;
+	for (int i = 0; i < imagenesSeparadas.size(); ++i)
+	{
+		etiquetas.push_back(obtainPathUntilLastFolder(imagenesSeparadas[i][0]));
+	}
+
+
+
+	
 	for (int i = 0; i < kFoldValue; ++i)
 	{	
-		cout << "Fold numero: " << i << endl;
 		vector<string> pathsEntrenamiento;
 		vector<string> pathsTest;
 		RealizarFoldI(i, kFoldValue, imagenesSeparadas, pathsEntrenamiento, pathsTest);
-		LlenarVectorDeConfusion(vectorDeConfusion,pathsEntrenamiento, pathsTest, alfa, knn);
+		pathsTestPorFold.push_back(pathsTest);
+		pathsEntrenamientoPorFold.push_back(pathsEntrenamiento);
+		GuardarSnapDeMatrizPCA(pathsEntrenamiento, maxAlfa, 300);
 	}
 
 
-	vector<vector<int>> matrizDeConfusion(41, vector<int>(41, 0));
-	for (int i = 0; i < vectorDeConfusion.size(); ++i)
-	{
-		matrizDeConfusion[vectorDeConfusion[i].first-1][vectorDeConfusion[i].second -1]++;
-	}
 
-	for (int i = 0; i < matrizDeConfusion.size(); ++i)
-	{
-		for (int j = 0; j < matrizDeConfusion.size(); ++j)
-		{
-			sal << i+1 << "," << j+1 << "," << matrizDeConfusion[i][j] << endl;
-		}
-	}
+ 	for(int k  = 1; k <= 1; k += 5){
+ 		for(int alfa = minAlfa; alfa <= maxAlfa; alfa += 5){
+ 			double F1ScorePromediado = 0.0;
+ 			for(int i = 0 ; i < kFoldValue; i ++){
+ 				ImagePredictor imagePredictor = ImagePredictor();
+ 				cout << "paths Entrenamiento Por Fold " << i << " size" << pathsEntrenamientoPorFold[i].size() << endl;
+ 				imagePredictor.loadImagesFromFileDataSet(pathsEntrenamientoPorFold[i]);
+ 				cout << "Cargue imagenes " << endl;
+ 				createImagePredictorWithAlpha(imagePredictor, i, alfa);
+ 				cout << "Tamaño paths test: " << pathsTestPorFold[i].size() << endl;
+ 				cout << "Tamaño paths entrenamiento: " << pathsEntrenamientoPorFold[i].size() << endl;
+ 				double f1Score = testF1ScorePromediado(imagePredictor,pathsTestPorFold[i], k, etiquetas);
+				
+ 				F1ScorePromediado += f1Score;
+ 			}
+
+ 			F1ScorePromediado = F1ScorePromediado / kFoldValue;
+ 			sal << k << "," << alfa << "," << F1ScorePromediado << endl;
+ 			cout << k << "," << alfa << "," << F1ScorePromediado << endl;
+ 		}
+ 	}
+
+
+ 	for(int k  = minK; k <= maxK; k += 5){
+ 		for(int alfa = minAlfa; alfa <= maxAlfa; alfa += 5){
+ 			double F1ScorePromediado = 0.0;
+ 			for(int i = 0 ; i < kFoldValue; i ++){
+ 				ImagePredictor imagePredictor;
+ 				createImagePredictorWithAlpha(imagePredictor, i, alfa);
+ 				imagePredictor.loadImagesFromFileDataSet(pathsEntrenamientoPorFold[i]);
+ 				
+ 				double f1Score = testF1ScorePromediado(imagePredictor,pathsTestPorFold[i], k, etiquetas);
+				
+ 				F1ScorePromediado += f1Score;
+ 			}
+
+ 			F1ScorePromediado = F1ScorePromediado / kFoldValue;
+ 			sal << k << "," << alfa << "," << F1ScorePromediado << endl;
+ 			cout << k << "," << alfa << "," << F1ScorePromediado << endl;
+ 		}
+ 	}
+
+	
 	sal.close();
 
 
+}
+
+double testF1Score(int kFoldValue){
+	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullBig.in");
+	string nombreFile;
+
+	int minAlfa = 5;
+	int maxAlfa = 100;
+	int minK = 5;
+	int maxK = 100;
+	// stringstream ss;
+	// ss << "alfa" << alfa << "knn" << knn;
+	// string fileSuffix = ss.str();
+	if(kFoldValue == 2){
+		nombreFile = "testPeterDir/f1ScoreAlfakK2";
+	}
+	if(kFoldValue == 5){
+		nombreFile = "testPeterDir/f1ScoreAlfakK5";	
+	}
+	if(kFoldValue == 10){
+		nombreFile = "testPeterDir/f1ScoreAlfakK10";
+	}
+	fstream sal(nombreFile, ios::out);
+
+	sal << "k,alfa,f1score" << endl;
+
+	cout << "Comienza con K = ";
+	cout << kFoldValue << endl;
+	cout << endl; 
+
+	vector<vector<string> > imagenesSeparadas(41, vector<string>());
+	
+	DesordenarImagenes(filePaths, imagenesSeparadas);
+
+	vector<string> etiquetas;
+	for (int i = 0; i < imagenesSeparadas.size(); ++i)
+	{
+		etiquetas.push_back(obtainPathUntilLastFolder(imagenesSeparadas[i][0]));
+	}
+
+	vector<vector<string>> pathsEntrenamientoPorFold;
+	vector<vector<string>> pathsTestPorFold;
+
+
+	for (int i = 0; i < kFoldValue; ++i)
+	{	
+		vector<string> pathsEntrenamiento;
+		vector<string> pathsTest;
+		RealizarFoldI(i, kFoldValue, imagenesSeparadas, pathsEntrenamiento, pathsTest);
+		pathsTestPorFold.push_back(pathsTest);
+		pathsEntrenamientoPorFold.push_back(pathsEntrenamiento);
+	}
+
+	ImagePredictor predictor = ImagePredictor();
+	predictor.loadImagesFromFileDataSet(pathsEntrenamientoPorFold[0]);
+	predictor.generateBasisChangeMatrixWithSVD(65, 300);
+
+	testF1ScorePromediado(predictor, pathsTestPorFold[0], 5, etiquetas);
+
+	return 0.0;
 }
 
 
@@ -304,5 +474,11 @@ int main(){
 	//CalcularMatrizConfusion(10, 70, 10);
 	//CalcularMatrizConfusion(10, 80, 20);
 	testF1ScoreSegunAlfaYk(10);
+	//testF1Score(10);
 	return 0;
 }
+
+
+
+
+
