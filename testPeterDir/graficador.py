@@ -32,9 +32,13 @@ def plotFiscore():
 	#Aca el archvio que quieran plotuear pongan, que tenga tres columnas nada mas.
 	r = pd.read_csv("f1ScoreAlfakK10.csv")
 
+	zData = []
+	i = 0
+	for x in r['f1score']:
+		zData.append( x*100)
 
 	#aca un renombre de las columnas para que se muestren las lleyendas.
-	colums = pd.DataFrame({"k vecinos" : r['k'], "alfa autovectores": r['alfa'], "f1score": r['f1score']})
+	colums = pd.DataFrame({"k vecinos" : r['k'], "alfa autovectores": r['alfa'], "f1score": zData})
 	combinaciones = colums.groupby(["k vecinos","alfa autovectores"]).mean()
 	combinaciones = combinaciones.reset_index()
 
@@ -46,7 +50,7 @@ def plotFiscore():
 	plt.ylabel('alfa autovectores', size = 15)
 	plt.title('F1Score segun combinacion K - Alfa', size = 15)
 	#a = plt.axes([.65, .6, .2, .2], facecolor='y')
-	sns.heatmap(pivot_table, annot=False, fmt=".1f", linewidths=.5, square = True, cmap = 'summer_r', cbar_kws={'label': 'segundos'});
+	sns.heatmap(pivot_table, annot=True, fmt=".0f", linewidths=.5, square = True, cmap = 'summer_r', cbar_kws={'label': 'segundos'});
 	plt.show()
 
 
@@ -54,7 +58,7 @@ def plotFiscore():
 
 
 
-plotConfusion()
+plotFiscore()
 
 
 

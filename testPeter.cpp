@@ -1,3 +1,4 @@
+#include <utility>  
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -8,6 +9,7 @@
 #include <chrono> 
 
 using namespace std;
+using namespace std::chrono;
 
 string directoryOfSnap = "snapImagePredictor";
 
@@ -415,13 +417,13 @@ double testF1Score(int kFoldValue){
 	// ss << "alfa" << alfa << "knn" << knn;
 	// string fileSuffix = ss.str();
 	if(kFoldValue == 2){
-		nombreFile = "testPeterDir/f1ScoreAlfakK2";
+		nombreFile = "testPeterDir/f1ScoreAlfakGregoK2";
 	}
 	if(kFoldValue == 5){
-		nombreFile = "testPeterDir/f1ScoreAlfakK5";	
+		nombreFile = "testPeterDir/f1ScoreAlfakGregoK5";	
 	}
 	if(kFoldValue == 10){
-		nombreFile = "testPeterDir/f1ScoreAlfakK10";
+		nombreFile = "testPeterDir/f1ScoreAlfakGregoK10";
 	}
 	fstream sal(nombreFile, ios::out);
 
@@ -463,7 +465,210 @@ double testF1Score(int kFoldValue){
 	return 0.0;
 }
 
+void calculateAcurracyTime(ImagePredictor& predictor, vector<string>& testeoFilesPath, double* acurracy, double* timePredictor, int kvecinos){
+	high_resolution_clock::time_point t1, t2;
+	vector<string> results;
+	vector<string> labelsTesteo;
 
+	for (int i = 0; i < testeoFilesPath.size(); ++i){
+		labelsTesteo.push_back(obtainPathUntilLastFolder(testeoFilesPath[i]));
+		
+		t1 = high_resolution_clock::now();
+ 		string imageObtained = predictor.clasificarImagen(testeoFilesPath[i], kvecinos);
+		t2 = high_resolution_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+		*timePredictor += time_span.count();
+		results.push_back(imageObtained);
+	}
+
+	*timePredictor = *timePredictor /results.size();
+	for (int i = 0; i < results.size(); ++i)
+	{
+		if (labelsTesteo[i] == results[i]){
+			*acurracy += 1;
+		}
+	}
+
+	*acurracy = *acurracy / results.size();
+}
+
+void calculateAcurracyTimeSinPca(ImagePredictor& predictor, vector<string>& testeoFilesPath, double* acurracy, double* timePredictor, int kvecinos){
+	high_resolution_clock::time_point t1, t2;
+	vector<string> results;
+	vector<string> labelsTesteo;
+
+	for (int i = 0; i < testeoFilesPath.size(); ++i){
+		labelsTesteo.push_back(obtainPathUntilLastFolder(testeoFilesPath[i]));
+		
+		t1 = high_resolution_clock::now();
+ 		string imageObtained = predictor.clasificarImagenSinPca(testeoFilesPath[i], kvecinos);
+		t2 = high_resolution_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+		*timePredictor += time_span.count();
+		results.push_back(imageObtained);
+		if (imageObtained == labelsTesteo[i])
+			cout << i << endl;
+	}
+
+	*timePredictor = *timePredictor /results.size();
+	for (int i = 0; i < results.size(); ++i)
+	{
+		if (labelsTesteo[i] == results[i]){
+			*acurracy += 1;
+		}
+	}
+	cout << *acurracy << endl;
+	*acurracy =  *acurracy / results.size();
+}
+
+void calculateAcurracyTimeKPuntos(ImagePredictor& predictor, vector<string>& testeoFilesPath, double* acurracy, double* timePredictor, int kvecinos){
+	high_resolution_clock::time_point t1, t2;
+	vector<string> results;
+	vector<string> labelsTesteo;
+
+	for (int i = 0; i < testeoFilesPath.size(); ++i){
+		labelsTesteo.push_back(obtainPathUntilLastFolder(testeoFilesPath[i]));
+		
+		t1 = high_resolution_clock::now();
+ 		string imageObtained = predictor.clasificarImagenGrego(testeoFilesPath[i], kvecinos);
+		t2 = high_resolution_clock::now();
+		duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
+		*timePredictor += time_span.count();
+		results.push_back(imageObtained);
+	}
+
+	*timePredictor = *timePredictor /results.size();
+	for (int i = 0; i < results.size(); ++i)
+	{
+		if (labelsTesteo[i] == results[i]){
+			*acurracy += 1;
+		}
+	}
+
+	*acurracy = *acurracy / results.size();
+}
+void experimentacionFinal(int kFoldValue){
+	vector<string> filePaths = levantarArchivosDesdeTestNipo("tests/testFullBig.in");
+	
+	string nombreFileK5 = "testPeterDir/expFinalK5";
+
+	int minAlfa = 5;
+	int maxAlfa = 100;
+	int minK = 5;
+	int maxK = 100;
+
+	stringstream ss;
+	ss << kFoldValue;
+	string fileSuffix = ss.str();
+	string nombreFile = "testPeterDir/expFinalK" + fileSuffix;
+	// stringstream ss;
+	// ss << "alfa" << alfa << "knn" << knn;
+	// string fileSuffix = ss.str();
+	
+	fstream sal(nombreFile, ios::out);
+	
+	sal << "algortimo,acurracy,tiempo" << endl;
+
+
+	vector<vector<string> > imagenesSeparadas(41, vector<string>());
+	
+	DesordenarImagenes(filePaths, imagenesSeparadas);
+
+	vector<string> etiquetas;
+	for (int i = 0; i < imagenesSeparadas.size(); ++i)
+	{
+		etiquetas.push_back(obtainPathUntilLastFolder(imagenesSeparadas[i][0]));
+	}
+
+	double acurracyAverage = 0.0;
+	double timeAverage = 0.0;
+	//Prueba con K=2 con PCA knn
+
+
+	for (int i = 0; i < kFoldValue; ++i)
+	{
+
+		double acurracyPerK = 0.0;
+		double timePerK = 0.0;
+
+
+		vector<string> pathsEntrenamiento;
+		vector<string> pathsTest;
+		RealizarFoldI(i, kFoldValue, imagenesSeparadas, pathsEntrenamiento, pathsTest);
+		ImagePredictor predictor = ImagePredictor();
+		
+		predictor.loadImagesFromFileDataSet(pathsEntrenamiento);
+		
+		calculateAcurracyTimeSinPca(predictor, pathsTest, &acurracyPerK, &timePerK, 1);
+		
+		acurracyAverage += acurracyPerK;
+		timeAverage += timePerK;
+
+
+		// pathsTestPorFold.push_back(pathsTest);
+		// pathsEntrenamientoPorFold.push_back(pathsEntrenamiento);
+	}
+	
+	
+	acurracyAverage = acurracyAverage/kFoldValue;
+	timeAverage = timeAverage/kFoldValue;
+
+	sal << "knnSinPca,"<< acurracyAverage << "," << timeAverage << endl;
+
+	acurracyAverage = 0.0;
+	timeAverage = 0.0;
+	for (int i = 0; i < kFoldValue; ++i)
+	{
+		double acurracyPerK = 0.0;
+		double timePerK = 0.0;
+		vector<string> pathsEntrenamiento;
+		vector<string> pathsTest;
+		RealizarFoldI(i, kFoldValue, imagenesSeparadas, pathsEntrenamiento, pathsTest);
+		ImagePredictor predictor = ImagePredictor();
+		predictor.loadImagesFromFileDataSet(pathsEntrenamiento);
+		predictor.generateBasisChangeMatrixWithSVD(40, 1000);
+		calculateAcurracyTime(predictor, pathsTest,&acurracyPerK, &timePerK, 1);
+ 
+		acurracyAverage += acurracyPerK;
+		timeAverage += timePerK;
+		// pathsTestPorFold.push_back(pathsTest);
+		// pathsEntrenamientoPorFold.push_back(pathsEntrenamiento);
+	}
+
+	acurracyAverage = acurracyAverage/kFoldValue;
+	timeAverage = timeAverage/kFoldValue;
+
+	sal << "knnPCA,"<< acurracyAverage << "," << timeAverage << endl;
+
+
+	timeAverage = 0.0;
+	acurracyAverage = 0.0;
+	
+	for (int i = 0; i < kFoldValue; ++i)
+	{
+		double acurracyPerK = 0.0;
+		double timePerK = 0.0;
+		vector<string> pathsEntrenamiento;
+		vector<string> pathsTest;
+		RealizarFoldI(i, kFoldValue, imagenesSeparadas, pathsEntrenamiento, pathsTest);
+		ImagePredictor predictor = ImagePredictor();
+		predictor.loadImagesFromFileDataSet(pathsEntrenamiento);
+		predictor.generateBasisChangeMatrixWithSVD(40, 1000);
+		calculateAcurracyTimeKPuntos(predictor, pathsTest, &acurracyPerK, &timePerK, 5);
+
+		acurracyAverage += acurracyPerK;
+		timeAverage += timePerK;
+		// pathsTestPorFold.push_back(pathsTest);
+		// pathsEntrenamientoPorFold.push_back(pathsEntrenamiento);
+	}
+
+	acurracyAverage = acurracyAverage/kFoldValue;
+	timeAverage = timeAverage/kFoldValue;
+
+	sal << "kPuntosPCA,"<< acurracyAverage << "," << timeAverage << endl;
+
+	sal.close();
+}
 
 int main(){
 	// testKnnSinPcaReduced(2);
@@ -473,7 +678,9 @@ int main(){
 	//CalcularMatrizConfusion(10, 65, 5);
 	//CalcularMatrizConfusion(10, 70, 10);
 	//CalcularMatrizConfusion(10, 80, 20);
-	testF1ScoreSegunAlfaYk(10);
+	//testF1ScoreSegunAlfaYk(10);
+	experimentacionFinal(5);
+ 
 	//testF1Score(10);
 	return 0;
 }
