@@ -116,8 +116,78 @@ def expKnnTimeK5():
 	plt.legend()
 	plt.show()	
 
+def expFinalK2Accuracy():
+	df1 = pd.read_csv('expFinalK2.csv')
+
+	g = sns.barplot(x='algoritmo', y='accuracy', data=df1)
+
+	x1,x2,y1,y2 = plt.axis()
+
+	for index, row in df1.iterrows():
+		g.text(row.name, row.accuracy, row.accuracy, color='black', ha="center")
+
+	plt.ylabel('Accuracy promedio (0 a 1)')
+	plt.title('K = 2, accuracy')
+
+	plt.legend()
+
+	plt.show()
+
+def expFinalK2Tiempo():
+	df1 = pd.read_csv('expFinalK2.csv')
+
+	g = sns.barplot(x='algoritmo', y='tiempo', data=df1)
+
+	x1,x2,y1,y2 = plt.axis()
+
+	for index, row in df1.iterrows():
+		g.text(row.name, row.tiempo, row.tiempo, color='black', ha="center")
+
+	plt.ylabel('Tiempo en segundos')
+	plt.title('K = 2, tiempo')
+
+	plt.legend()
+
+	plt.show()
+
+def expFinalK5Accuracy():
+	df1 = pd.read_csv('expFinalK5.csv')
+
+	g = sns.barplot(x='algoritmo', y='accuracy', data=df1)
+
+	x1,x2,y1,y2 = plt.axis()
+
+	for index, row in df1.iterrows():
+		g.text(row.name, row.accuracy, row.accuracy, color='black', ha="center")
+
+	plt.ylabel('Accuracy promedio (0 a 1)')
+	plt.title('K = 5, accuracy')
+
+	plt.legend()
+
+	plt.show()
+
+def expFinalK5Tiempo():
+	df1 = pd.read_csv('expFinalK5.csv')
+
+	g = sns.barplot(x='algoritmo', y='tiempo', data=df1)
+
+	x1,x2,y1,y2 = plt.axis()
+
+	for index, row in df1.iterrows():
+		g.text(row.name, row.tiempo, row.tiempo, color='black', ha="center")
+
+	plt.ylabel('Tiempo en segundos')
+	plt.title('K = 5, tiempo')
+
+	plt.legend()
+
+	plt.show()
+
 # expKnnAccurReduced()
 # expKnnAccurK5()
 # exp1vs2()
 # expKnnTimeReduced()
-expKnnTimeK5()
+# expKnnTimeK5()
+expFinalK5Accuracy()
+expFinalK5Tiempo()

@@ -1,0 +1,4 @@
+algoritmo,accuracy,tiempo
+knnSinPca,0.970732,1.45426
+knnPCA,0.978049,0.0198968
+kPuntosPCA,0.871951,0.0243754
